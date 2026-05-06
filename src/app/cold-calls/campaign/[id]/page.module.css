@@ -1,0 +1,576 @@
+.main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─────────────────────────────────────────────
+   TOP BAR
+───────────────────────────────────────────── */
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.25rem 4rem;
+  background: rgba(5, 5, 5, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--glass-border);
+  flex-wrap: wrap;
+}
+
+[data-theme="dark"] .topBar,
+[data-theme="light"] .topBar {
+  background: rgba(5, 5, 5, 0.85);
+}
+
+.backLink {
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.campaignMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.campaignMeta h1 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.statusBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.4rem;
+}
+
+.statusRunning {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.statusPaused {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.topStats {
+  display: flex;
+  gap: 2rem;
+}
+
+.topStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.topStat span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--secondary);
+  letter-spacing: 0.05em;
+}
+
+.topStat strong {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.topStat .green {
+  color: #10b981;
+}
+
+.topStat .blue {
+  color: var(--primary);
+}
+
+/* ─────────────────────────────────────────────
+   LAYOUT
+───────────────────────────────────────────── */
+.container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem 4rem;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.callSection {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sidebar {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ─────────────────────────────────────────────
+   CALL TABLE
+───────────────────────────────────────────── */
+.callTableCard,
+.callDetailCard {
+  padding: 1.75rem;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sectionHeader h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.liveDot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.liveDot span {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse-ring 1.5s infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+  }
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--secondary);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.table td {
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 0.8125rem;
+}
+
+.callRow {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.callRow:hover {
+  background: rgba(0, 102, 255, 0.15);
+}
+
+.callRow.selected {
+  background: rgba(0, 127, 255, 0.08);
+}
+
+.nameCell {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.phoneCell {
+  color: var(--secondary);
+  font-family: monospace;
+}
+
+.durationCell {
+  color: var(--secondary);
+  font-family: monospace;
+}
+
+.durationTicking {
+  color: var(--primary);
+  font-weight: 700;
+  animation: tick-fade 1s ease-in-out infinite;
+}
+
+@keyframes tick-fade {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Status Pills */
+.statusInProgress {
+  padding: 0.2rem 0.5rem;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+  border-radius: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.statusQualified {
+  padding: 0.2rem 0.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-radius: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.statusNotInterested {
+  padding: 0.2rem 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-radius: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.statusQueued {
+  padding: 0.2rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--secondary);
+  border-radius: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.resultGood {
+  color: #10b981;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.resultBad {
+  color: #ef4444;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.resultPending {
+  color: var(--secondary);
+  font-size: 0.8125rem;
+}
+
+/* ─────────────────────────────────────────────
+   CALL DETAIL
+───────────────────────────────────────────── */
+.callDetailCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.detailGrid div {
+  display: flex;
+  flex-direction: column;
+}
+
+.detailGrid span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.detailGrid strong {
+  font-size: 0.9375rem;
+  color: var(--foreground);
+}
+
+.callSummaryBox {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(0, 127, 255, 0.05);
+  border-radius: 0.6rem;
+  border-left: 3px solid var(--primary);
+}
+
+.callSummaryBox span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.callSummaryBox p {
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+
+/* ─────────────────────────────────────────────
+   SCRIPTS SIDEBAR
+───────────────────────────────────────────── */
+.scriptCard,
+.agentStatusCard {
+  padding: 1.75rem;
+}
+
+.scriptCard h3,
+.agentStatusCard h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.scriptCard p,
+.agentStatusCard p {
+  font-size: 0.8125rem;
+  color: var(--secondary);
+  margin-bottom: 1.25rem;
+}
+
+.dropZone {
+  border: 2px dashed var(--glass-border);
+  border-radius: 0.75rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 1.25rem;
+}
+
+.dropZone:hover,
+.dropZone.dragOver {
+  border-color: var(--primary);
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.dropIcon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.dropText {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.dropSub {
+  font-size: 0.75rem;
+  color: var(--secondary);
+}
+
+.scriptList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.scriptItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 0.6rem;
+  border: 1px solid var(--glass-border);
+}
+
+.scriptIcon {
+  font-size: 1.25rem;
+}
+
+.scriptMeta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.scriptMeta strong {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.scriptMeta span {
+  font-size: 0.7rem;
+  color: var(--secondary);
+}
+
+.scriptActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.activeBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.3rem;
+}
+
+.removeBtn {
+  background: transparent;
+  border: none;
+  color: var(--secondary);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  line-height: 1;
+}
+
+/* ─────────────────────────────────────────────
+   AGENT STATUS
+───────────────────────────────────────────── */
+.agentRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.agentDot {
+  width: 10px;
+  height: 10px;
+  background: #10b981;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: pulse-ring 1.5s infinite;
+}
+
+.agentRow strong {
+  font-size: 0.9375rem;
+  color: var(--foreground);
+}
+
+.agentRow p {
+  font-size: 0.75rem;
+  color: var(--secondary);
+  margin: 0.2rem 0 0;
+}
+
+.pauseButton {
+  width: 100%;
+  padding: 0.875rem;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid #f59e0b;
+  color: #d97706;
+  border-radius: 0.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pauseButton:hover {
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.secondaryButton {
+  padding: 0.875rem;
+  background: rgba(0, 127, 255, 0.08);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: 0.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.secondaryButton:hover:not(:disabled) {
+  background: rgba(0, 127, 255, 0.15);
+}
+
+.secondaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dangerButton {
+  padding: 0.875rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  border-radius: 0.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dangerButton:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+@media (max-width: 1200px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .topBar,
+  .container {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .topStats {
+    gap: 1rem;
+  }
+}

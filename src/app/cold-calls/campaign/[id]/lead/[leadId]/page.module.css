@@ -1,0 +1,252 @@
+.main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.25rem 4rem;
+  background: rgba(5, 5, 5, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--glass-border);
+  flex-wrap: wrap;
+}
+
+.backLink {
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.campaignMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.campaignMeta h1 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.statusBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.4rem;
+}
+
+.statusGood {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.statusBad {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.statusPending {
+  color: var(--secondary);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.topStats {
+  display: flex;
+  gap: 2rem;
+}
+
+.topStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.topStat span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--secondary);
+  letter-spacing: 0.05em;
+}
+
+.topStat strong {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem 4rem;
+  flex: 1;
+  align-items: stretch;
+}
+
+.leftColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 350px;
+}
+
+.transcriptColumn {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.metaCard {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.metaCard h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.detailGrid div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detailGrid span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.detailGrid strong {
+  font-size: 1rem;
+  color: var(--foreground);
+}
+
+.summaryBox {
+  padding: 1.25rem;
+  background: rgba(0, 127, 255, 0.03);
+  border-left: 3px solid var(--primary);
+  border-radius: 0.5rem;
+}
+
+.summaryBox span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.summaryBox p {
+  font-size: 0.875rem;
+  color: var(--foreground);
+  line-height: 1.5;
+}
+
+.transcriptCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: calc(100vh - 150px);
+}
+
+.transcriptHeader {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transcriptHeader h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.transcriptList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.messageRow {
+  display: flex;
+  width: 100%;
+}
+
+.messageRow.ai {
+  justify-content: flex-start;
+}
+
+.messageRow.user {
+  justify-content: flex-end;
+}
+
+.messageBubble {
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.messageMeta {
+  font-size: 0.7rem;
+  color: var(--secondary);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin: 0 0.25rem;
+}
+
+.messageRow.ai .messageMeta {
+  text-align: left;
+}
+
+.messageRow.user .messageMeta {
+  text-align: right;
+}
+
+.messageContent {
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.messageRow.ai .messageContent {
+  background: var(--ai-bubble);
+  color: var(--ai-text);
+  border-top-left-radius: 0;
+  border: 1px solid var(--glass-border);
+}
+
+.messageRow.user .messageContent {
+  background: var(--user-bubble);
+  color: var(--user-text);
+  border-top-right-radius: 0;
+  box-shadow: 0 4px 10px -1px rgba(0, 127, 255, 0.25);
+}

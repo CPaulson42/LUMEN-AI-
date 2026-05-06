@@ -1,0 +1,230 @@
+.main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem 4rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.leftColumn {
+  flex: 1;
+  max-width: 400px;
+}
+
+.rightColumn {
+  flex: 2;
+}
+
+.card {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardHeader h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.cardHeader span {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-radius: 0.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.planPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.planPrice strong {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.planPrice span {
+  font-size: 1rem;
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.usageMeter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.usageMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.usageTitle { color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+.usageValue { color: var(--foreground); }
+
+.progressTrack {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 127, 255, 0.5);
+}
+
+.stripeButton {
+  width: 100%;
+  padding: 1rem;
+  background: #635bff;
+  color: white;
+  border: none;
+  border-radius: 0.6rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: var(--transition);
+  margin-top: 1rem;
+}
+
+.stripeButton:hover {
+  background: #5850eb;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(99, 91, 255, 0.3);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--secondary);
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.table td {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+
+.statusPaid {
+  padding: 0.25rem 0.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-radius: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.statusUpcoming {
+  padding: 0.25rem 0.5rem;
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border-radius: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.invoiceLink {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.invoiceLink:hover {
+  text-decoration: underline;
+}
+
+.paymentMethodRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.5rem;
+}
+
+.paymentIcon {
+  width: 48px;
+  height: 32px;
+  background: white;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1f36;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+.paymentDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.paymentDetails strong {
+  font-size: 0.875rem;
+}
+
+.paymentDetails span {
+  font-size: 0.75rem;
+  color: var(--secondary);
+}
+
+@media (max-width: 1024px) {
+  .container { flex-direction: column; }
+  .leftColumn, .rightColumn { max-width: 100%; width: 100%; }
+}

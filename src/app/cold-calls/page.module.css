@@ -1,0 +1,710 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  padding: 2rem 4rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statsCard {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.statsLabel {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--secondary);
+  letter-spacing: 0.05em;
+}
+
+.statsValue {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.statsTrend {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.statsTrend.up { color: #10b981; }
+.statsTrend.neutral { color: var(--secondary); }
+
+.dashboardGrid {
+  display: flex;
+  gap: 2rem;
+}
+
+.mainContent {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.campaignCard, .logCard {
+  padding: 2rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.cardHeader h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--secondary);
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.table td {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+
+.statusActive {
+  padding: 0.25rem 0.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-radius: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.statusPaused {
+  padding: 0.25rem 0.5rem;
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border-radius: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.progressBar {
+  width: 80px;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  display: inline-block;
+  margin-left: 0.5rem;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+}
+
+.primaryButton {
+  padding: 0.75rem 1.25rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.primaryButton:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.textButton {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: 0;
+  line-height: 1;
+  height: 20px;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+.textButton:hover {
+  color: #60a5fa !important;
+  text-shadow: 0 0 8px rgba(96, 165, 250, 0.6);
+}
+
+.callLogList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.callLogItem {
+  padding: 1rem;
+  background: rgba(15, 15, 15, 0.8);
+  border-radius: 0.8rem;
+  border-left: 4px solid var(--glass-border);
+}
+
+.callLogItem:hover {
+  background: rgba(25, 25, 25, 0.9);
+}
+
+.callMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.callTime {
+  font-size: 0.75rem;
+  color: var(--secondary);
+}
+
+.callResultQualified {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.callResultNeutral {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--secondary);
+}
+
+.callSummary strong {
+  font-size: 0.9375rem;
+  color: var(--foreground);
+}
+
+.callSummary p {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  color: var(--secondary);
+}
+
+.sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.configCard {
+  padding: 2rem;
+}
+
+.configCard h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.configCard p {
+  font-size: 0.8125rem;
+  margin-bottom: 1.5rem;
+}
+
+.configField {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.configField label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.select {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--glass-border);
+  background: #111111;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.range {
+  width: 100%;
+}
+
+.rangeValue {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: right;
+}
+
+.secondaryButton {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 1rem;
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: 0.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.secondaryButton:hover {
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.secondaryButton.loading {
+  background: rgba(37, 99, 235, 0.05);
+  cursor: wait;
+}
+
+.estimatorCard {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: rgba(0, 127, 255, 0.04);
+  border: 1px solid rgba(0, 127, 255, 0.12);
+  border-radius: 0.75rem;
+}
+
+.estimatorTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+}
+
+.estimatorGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.estimatorItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.6rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 0.5rem;
+}
+
+.estimatorLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.estimatorValue {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.tierBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.tierRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8125rem;
+  color: var(--foreground);
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.tierRow:last-child {
+  border-bottom: none;
+}
+
+.tierMinutes {
+  color: var(--secondary);
+  font-size: 0.75rem;
+}
+
+.tierOk {
+  font-weight: 700;
+  color: #10b981;
+  font-size: 0.8125rem;
+}
+
+.tierWarn {
+  font-weight: 700;
+  color: #f59e0b;
+  font-size: 0.8125rem;
+}
+
+.estimatorWarn {
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
+  color: #f59e0b;
+  line-height: 1.4;
+}
+
+.testPulse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.testPulse span {
+  width: 8px;
+  height: 8px;
+  background: var(--primary);
+  border-radius: 50%;
+  animation: test-pulse 1s infinite;
+}
+
+@keyframes test-pulse {
+  0% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.5); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.5; }
+}
+
+.generatedTestsList {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.generatedTestsList h4 {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.generatedTestItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(15, 15, 15, 0.8);
+  border-radius: 0.5rem;
+  border: 1px solid var(--glass-border);
+}
+
+.testMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.testMeta strong {
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+
+.testMeta span {
+  font-size: 0.75rem;
+  color: var(--secondary);
+}
+
+.playAudioBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.playAudioBtn:hover {
+  transform: scale(1.1);
+}
+
+.previewBtn {
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 127, 255, 0.08);
+  border: 1px solid rgba(0, 127, 255, 0.2);
+  color: var(--primary);
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.previewBtn:hover {
+  background: rgba(0, 127, 255, 0.15);
+}
+
+.previewBtn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.trustBadge {
+  display: flex;
+  padding: 1.25rem;
+  gap: 1rem;
+  align-items: center;
+}
+
+.badgeIcon {
+  font-size: 1.5rem;
+}
+
+.badgeText h4 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.badgeText p {
+  font-size: 0.75rem;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 500px;
+  padding: 2.5rem;
+  margin: 1rem;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.modalHeader h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.input {
+  padding: 0.75rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--glass-border);
+  background: #111111;
+  color: var(--foreground);
+  outline: none;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.modalActions .primaryButton, 
+.modalActions .secondaryButton {
+  flex: 1;
+}
+
+
+.dropZone {
+  padding: 1.5rem;
+  border: 2px dashed var(--glass-border);
+  border-radius: 0.75rem;
+  background: rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.dropZone:hover {
+  border-color: rgba(0, 127, 255, 0.3);
+  background: rgba(0, 127, 255, 0.03);
+}
+
+.dropZoneActive {
+  border-color: var(--primary) !important;
+  background: rgba(0, 127, 255, 0.08) !important;
+  box-shadow: 0 0 20px rgba(0, 127, 255, 0.1);
+}
+
+.dropZoneSuccess {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.04);
+  border-style: solid;
+}
+
+.uploadPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--secondary);
+}
+
+.uploadPrompt strong {
+  color: var(--foreground);
+  font-size: 0.9375rem;
+}
+
+.uploadPrompt span {
+  font-size: 0.75rem;
+}
+
+.uploadSuccess {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.uploadSuccess strong {
+  color: #10b981;
+  font-size: 1.125rem;
+}
+
+.uploadSuccess span {
+  font-size: 0.75rem;
+  color: var(--secondary);
+}
+
+.numberPreview {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.previewLabel {
+  font-weight: 700;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.6875rem;
+}
+
+.previewNumbers {
+  color: var(--foreground);
+  font-family: var(--font-geist-mono);
+  flex: 1;
+}
+
+.clearUpload {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.clearUpload:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+@media (max-width: 1200px) {
+  .dashboardGrid { flex-direction: column; }
+}
+
+@media (max-width: 1024px) {
+  .container { padding: 2rem; }
+}
+
+@media (max-width: 768px) {
+  .statsGrid { grid-template-columns: 1fr 1fr; }
+  .header h1 { font-size: 1.75rem; }
+}
