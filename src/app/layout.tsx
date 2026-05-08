@@ -21,6 +21,8 @@ export const metadata: Metadata = {
 };
 
 import Header from "@/components/Header";
+import ReferralTracker from "@/components/ReferralTracker";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -31,6 +33,9 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <div className="bg-gradient"></div>
+        <Suspense fallback={null}>
+          <ReferralTracker />
+        </Suspense>
         <Header />
         {children}
       </body>

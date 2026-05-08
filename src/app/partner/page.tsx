@@ -1,15 +1,45 @@
-'use client';
-
-import { useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import styles from './page.module.css';
+import { createClient } from '@/utils/supabase/client';
 
 export default function PartnerDashboard() {
   const [copied, setCopied] = useState(false);
-  
-  const affiliateLink = "lumenai.com/ref/joshua-elite";
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [host, setHost] = useState('');
+
+  const supabase = useMemo(() => createClient(), []);
+
+  useEffect(() => {
+    setHost(window.location.origin);
+
+    async function fetchProfile() {
+      if (!supabase) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('referral_code')
+          .eq('id', user.id)
+          .single();
+        
+        if (data?.referral_code) {
+          setReferralCode(data.referral_code);
+        }
+      }
+      setLoading(false);
+    }
+
+    fetchProfile();
+  }, [supabase]);
+
+  const affiliateLink = referralCode 
+    ? `${host}/?ref=${referralCode}`
+    : "Loading link...";
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(`https://${affiliateLink}`);
+    if (!referralCode) return;
+    navigator.clipboard.writeText(affiliateLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -37,8 +67,12 @@ export default function PartnerDashboard() {
         <h1 className={styles.title}>Partner Revenue Share</h1>
         <div className={styles.affiliateCard}>
           <span className={styles.affiliateLabel}>Your Referral Link:</span>
-          <span className={styles.affiliateLink}>{affiliateLink}</span>
-          <button className={styles.copyBtn} onClick={handleCopy}>
+          <span className={styles.affiliateLink} style={{ fontSize: '0.85rem' }}>{affiliateLink}</span>
+          <button 
+            className={styles.copyBtn} 
+            onClick={handleCopy}
+            disabled={!referralCode}
+          >
             {copied ? 'Copied!' : 'Copy Link'}
           </button>
         </div>
