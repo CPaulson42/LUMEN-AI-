@@ -85,7 +85,7 @@ export default function Header() {
           href="/"
           className={`${styles.navLink} ${pathname === '/' ? styles.active : ''}`}
         >
-          Why Lumen
+          Why <span style={{ color: 'var(--primary)' }}>Lumen</span>
         </Link>
         <Link
           href="/cold-calls"
