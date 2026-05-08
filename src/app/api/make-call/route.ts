@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Retell from 'retell-sdk';
 
-const retell = new Retell({
-  apiKey: process.env.RETELL_API_KEY || '',
-});
-
 export async function POST(req: NextRequest) {
+  const retell = new Retell({
+    apiKey: process.env.RETELL_API_KEY || '',
+  });
   try {
     const { agentId, toNumber } = await req.json();
 

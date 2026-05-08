@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 
-const RETELL_API_KEY = process.env.RETELL_API_KEY;
-
 // Fetch Grace and Alex directly by their known agent IDs
 const AGENT_IDS = [
   { id: 'agent_4fe1583b02383dff1d7dcfc0fd', label: 'Alex' },
@@ -9,6 +7,7 @@ const AGENT_IDS = [
 ];
 
 export async function GET() {
+  const RETELL_API_KEY = process.env.RETELL_API_KEY;
   try {
     const results = await Promise.all(
       AGENT_IDS.map(async ({ id, label }) => {
