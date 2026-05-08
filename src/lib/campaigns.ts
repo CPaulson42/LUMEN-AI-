@@ -16,6 +16,7 @@ export interface Campaign {
 
 export async function getCampaigns(): Promise<Campaign[]> {
   const supabase = createClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from('campaigns')
     .select('*')
@@ -30,6 +31,7 @@ export async function getCampaigns(): Promise<Campaign[]> {
 
 export async function getCampaignById(id: string): Promise<Campaign | null> {
   const supabase = createClient();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from('campaigns')
     .select('*')
@@ -45,6 +47,7 @@ export async function getCampaignById(id: string): Promise<Campaign | null> {
 
 export async function saveCampaign(campaign: Campaign): Promise<boolean> {
   const supabase = createClient();
+  if (!supabase) return false;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) return false;
@@ -75,6 +78,7 @@ export async function saveCampaign(campaign: Campaign): Promise<boolean> {
 
 export async function deleteCampaign(id: string): Promise<boolean> {
   const supabase = createClient();
+  if (!supabase) return false;
   const { error } = await supabase
     .from('campaigns')
     .delete()

@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/server'
 
 export async function login(prevState: any, formData: FormData) {
   const supabase = await createClient()
+  if (!supabase) return { error: 'Database connection not configured.' }
 
   const data = {
     email: formData.get('email') as string,
@@ -24,6 +25,7 @@ export async function login(prevState: any, formData: FormData) {
 
 export async function signup(prevState: any, formData: FormData) {
   const supabase = await createClient()
+  if (!supabase) return { error: 'Database connection not configured.' }
 
   const data = {
     email: formData.get('email') as string,

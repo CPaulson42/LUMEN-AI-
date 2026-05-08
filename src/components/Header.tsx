@@ -18,6 +18,8 @@ export default function Header() {
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
+    if (!supabase) return;
+
     // Check active session
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
