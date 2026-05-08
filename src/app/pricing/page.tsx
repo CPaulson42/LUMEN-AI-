@@ -44,7 +44,7 @@ export default function PricingPage() {
   return (
     <main className={styles.main}>
       <section className={`${styles.hero} fade-in`}>
-        <h1>Scale your agency with <span>Lumen AI</span></h1>
+        <h1>Scale your agency with <span style={{ color: 'var(--primary)' }}>Lumen AI</span></h1>
         <p>Choose the automated conversational tier that perfectly fits your lead volume. No hidden fees. Upgrade or cancel at any time.</p>
       </section>
 
