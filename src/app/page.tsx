@@ -7,9 +7,8 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <section className={`${styles.hero} fade-in`}>
-        <h1 style={{ marginBottom: '0.5rem' }}>Why <span style={{ color: 'var(--primary)' }}>Lumen</span>?</h1>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: 'var(--secondary)', marginBottom: '2rem', fontStyle: 'italic' }}>The Future of AI Voice for Agencies</h2>
-        <p>Lumen Leads empowers your agency with ultra-realistic AI voice agents that qualify leads, book appointments, and scale your outreach automatically. We don't just provide a tool; we provide a scalable workforce.</p>
+        <h1>Your Ai Voice for the Future</h1>
+        <p>Lumen Leads empowers your agency with ultra-realistic AI voice agents that qualify leads, book appointments, and scale your outreach automatically.</p>
         <Link href="/pricing" className={styles.ctaButton}>
           Get Started
         </Link>
@@ -150,14 +149,15 @@ export default function Home() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.36 12 19.79 19.79 0 0 1 1.21 3.17 2 2 0 0 1 3.18 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.37a16 16 0 0 0 6.29 6.29l1.45-1.45a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                 Call me now
               </button>
-
-              <div className={styles.challengeBox}>
-                <div className={styles.challengeBadge}>TRY TO BREAK ME</div>
-                <p className={styles.challengeText}>
-                  "Call the number and try to change your order three times in 30 seconds. See if our AI keeps up."
-                </p>
-              </div>
               <p className={styles.demoDisclaimer}>By submitting, you agree to our <a href="#">terms</a> and to be contacted about this demo.</p>
+              
+              <div className={styles.challengeCard}>
+                <div className={styles.challengeHeader}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                  <span>The "Try to Break Me" Challenge</span>
+                </div>
+                <p>Call the number and try to change your order three times in 30 seconds. See if our AI keeps up.</p>
+              </div>
             </form>
           </div>
           <div className={styles.demoRight}>
