@@ -471,36 +471,7 @@
   font-weight: 500;
 }
 
-.challengeBox {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: rgba(2, 89, 198, 0.05);
-  border: 1px dashed rgba(2, 89, 198, 0.3);
-  border-radius: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.challengeBadge {
-  background: var(--primary);
-  color: white;
-  font-size: 0.7rem;
-  font-weight: 800;
-  padding: 0.2rem 0.6rem;
-  border-radius: 4px;
-  width: fit-content;
-  letter-spacing: 0.05em;
-}
-
-.challengeText {
-  font-size: 0.9rem;
-  color: var(--foreground) !important;
-  font-style: italic;
-  line-height: 1.4;
-}
-
 .storyLink:hover {
-  color: #0259c6;
+  color: #007fff;
   transform: translateY(-2px);
 }
