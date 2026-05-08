@@ -73,7 +73,7 @@ export default function Header() {
                 className={styles.logoImage}
               />
             </div>
-            <span className={styles.logoText}>Lumen Leads</span>
+            <span className={styles.logoText}><span style={{ color: '#0259c6' }}>Lumen</span> Leads</span>
           </div>
         </Link>
         <div className={styles.separator}></div>
@@ -85,7 +85,7 @@ export default function Header() {
           href="/"
           className={`${styles.navLink} ${pathname === '/' ? styles.active : ''}`}
         >
-          Why <span style={{ color: 'var(--primary)' }}>Lumen</span>
+          Why <span style={{ color: '#0259c6' }}>Lumen</span>
         </Link>
         <Link
           href="/cold-calls"
