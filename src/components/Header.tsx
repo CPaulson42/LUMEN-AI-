@@ -82,8 +82,14 @@ export default function Header() {
 
       <nav className={styles.nav}>
         <Link
+          href="/"
+          className={`${styles.navLink} ${pathname === '/' ? styles.active : ''}`}
+        >
+          Why Lumen
+        </Link>
+        <Link
           href="/cold-calls"
-          className={`${styles.navLink} ${pathname === '/' || pathname?.startsWith('/cold-calls') ? styles.active : ''}`}
+          className={`${styles.navLink} ${pathname?.startsWith('/cold-calls') ? styles.active : ''}`}
         >
           Cold Calls
         </Link>

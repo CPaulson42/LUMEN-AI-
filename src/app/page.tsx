@@ -7,8 +7,9 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <section className={`${styles.hero} fade-in`}>
-        <h1>Your Ai Voice for the Future</h1>
-        <p>Lumen Leads empowers your agency with ultra-realistic AI voice agents that qualify leads, book appointments, and scale your outreach automatically.</p>
+        <h1 style={{ marginBottom: '0.5rem' }}>Why <span style={{ color: 'var(--primary)' }}>Lumen</span>?</h1>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: 'var(--secondary)', marginBottom: '2rem', fontStyle: 'italic' }}>The Future of AI Voice for Agencies</h2>
+        <p>Lumen Leads empowers your agency with ultra-realistic AI voice agents that qualify leads, book appointments, and scale your outreach automatically. We don't just provide a tool; we provide a scalable workforce.</p>
         <Link href="/pricing" className={styles.ctaButton}>
           Get Started
         </Link>
