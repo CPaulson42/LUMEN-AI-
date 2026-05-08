@@ -81,36 +81,42 @@ export default function Header() {
       </div>
 
       <nav className={styles.nav}>
-        <Link
-          href="/cold-calls"
-          className={`${styles.navLink} ${pathname === '/' || pathname?.startsWith('/cold-calls') ? styles.active : ''}`}
-        >
-          Cold Calls
-        </Link>
+        {user && (
+          <Link
+            href="/cold-calls"
+            className={`${styles.navLink} ${pathname === '/' || pathname?.startsWith('/cold-calls') ? styles.active : ''}`}
+          >
+            Cold Calls
+          </Link>
+        )}
         <Link
           href="/pricing"
           className={`${styles.navLink} ${pathname?.startsWith('/pricing') ? styles.active : ''}`}
         >
           Pricing
         </Link>
-        <Link
-          href="/billing"
-          className={`${styles.navLink} ${pathname?.startsWith('/billing') ? styles.active : ''}`}
-        >
-          Billing
-        </Link>
-        <Link
-          href="/admin"
-          className={`${styles.navLink} ${pathname?.startsWith('/admin') ? styles.active : ''}`}
-        >
-          Admin Portal
-        </Link>
-        <Link
-          href="/partner"
-          className={`${styles.navLink} ${pathname?.startsWith('/partner') ? styles.active : ''}`}
-        >
-          Partner Portal
-        </Link>
+        {user && (
+          <>
+            <Link
+              href="/billing"
+              className={`${styles.navLink} ${pathname?.startsWith('/billing') ? styles.active : ''}`}
+            >
+              Billing
+            </Link>
+            <Link
+              href="/admin"
+              className={`${styles.navLink} ${pathname?.startsWith('/admin') ? styles.active : ''}`}
+            >
+              Admin Portal
+            </Link>
+            <Link
+              href="/partner"
+              className={`${styles.navLink} ${pathname?.startsWith('/partner') ? styles.active : ''}`}
+            >
+              Partner Portal
+            </Link>
+          </>
+        )}
       </nav>
 
       <div className={styles.rightGroup}>
