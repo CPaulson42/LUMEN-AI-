@@ -18,22 +18,6 @@ export default function Home() {
           </a>
         </div>
       </section>
-      <section className={`${styles.whySection} fade-in`} style={{ animationDelay: '0.05s' }}>
-        <div className={styles.whyGrid}>
-          <div className={styles.whyItem}>
-            <h3>95% Cost Reduction</h3>
-            <p>Replace expensive human dialers with AI that costs a fraction of a traditional salary.</p>
-          </div>
-          <div className={styles.whyItem}>
-            <h3>100% Consistency</h3>
-            <p>Every call is handled with the exact same professional tone and script adherence.</p>
-          </div>
-          <div className={styles.whyItem}>
-            <h3>Infinite Concurrency</h3>
-            <p>Make 1 or 1,000 calls at the exact same moment. Your capacity is truly limitless.</p>
-          </div>
-        </div>
-      </section>
 
       <section className={`${styles.featuresGrid} fade-in`} style={{ animationDelay: '0.1s' }}>
         <div className={`${styles.featureCard} glass-panel premium-card`}>
