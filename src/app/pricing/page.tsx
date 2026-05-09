@@ -26,7 +26,7 @@ export default function PricingPage() {
         window.location.href = data.url;
       } else {
         console.error(data.error);
-        alert('Failed to initiate checkout.');
+        alert('Failed to initiate checkout: ' + (data.error || 'Unknown error'));
       }
     } catch (error) {
       console.error(error);
