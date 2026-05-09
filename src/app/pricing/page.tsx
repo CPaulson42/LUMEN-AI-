@@ -5,10 +5,12 @@ import styles from './page.module.css';
 
 export default function PricingPage() {
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleCheckout = async (priceId: string | undefined, planName: string) => {
+    setErrorMsg(null);
     if (!priceId) {
-      alert('Price ID is missing for ' + planName + ' plan. Check environment variables.');
+      setErrorMsg('Price ID is missing for ' + planName + ' plan. Check environment variables.');
       return;
     }
     
@@ -26,11 +28,11 @@ export default function PricingPage() {
         window.location.href = data.url;
       } else {
         console.error(data.error);
-        alert('Failed to initiate checkout: ' + (data.error || 'Unknown error'));
+        setErrorMsg('Checkout Error: ' + (data.error || 'Unknown error'));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('An error occurred during checkout.');
+      setErrorMsg('Network Error: ' + error.message);
     } finally {
       setIsLoading(null);
     }
@@ -43,6 +45,11 @@ export default function PricingPage() {
 
   return (
     <main className={styles.main}>
+      {errorMsg && (
+        <div className={styles.errorBanner}>
+          {errorMsg}
+        </div>
+      )}
       <section className={`${styles.hero} fade-in`}>
         <h1>Scale your agency with <span>Lumen AI</span></h1>
         <p>Choose the automated conversational tier that perfectly fits your lead volume. No hidden fees. Upgrade or cancel at any time.</p>
