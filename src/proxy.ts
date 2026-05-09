@@ -52,8 +52,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Redirect logged in users away from the landing/login pages
-  // Redirect logged in users away from the login page
-  if (user && request.nextUrl.pathname.startsWith('/login')) {
+  if (user && (request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/login'))) {
     const url = request.nextUrl.clone()
     url.pathname = '/cold-calls'
     return NextResponse.redirect(url)

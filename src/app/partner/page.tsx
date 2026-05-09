@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState, useMemo } from 'react';
 import styles from './page.module.css';
 import { createClient } from '@/utils/supabase/client';
