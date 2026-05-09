@@ -81,12 +81,19 @@ export default function Header() {
       </div>
 
       <nav className={styles.nav}>
-        {user && (
+        {user ? (
           <Link
             href="/cold-calls"
-            className={`${styles.navLink} ${pathname === '/' || pathname?.startsWith('/cold-calls') ? styles.active : ''}`}
+            className={`${styles.navLink} ${pathname?.startsWith('/cold-calls') ? styles.active : ''}`}
           >
             Cold Calls
+          </Link>
+        ) : (
+          <Link
+            href="/"
+            className={`${styles.navLink} ${pathname === '/' ? styles.active : ''}`}
+          >
+            Why <span>Lumen</span>
           </Link>
         )}
         <Link

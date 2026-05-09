@@ -88,7 +88,7 @@
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--foreground);
   transition: var(--transition);
   padding: 0.25rem 0.5rem;
 }
@@ -98,7 +98,7 @@
 }
 
 .navLink.active {
-  color: var(--primary);
+  color: var(--foreground);
   position: relative;
 }
 

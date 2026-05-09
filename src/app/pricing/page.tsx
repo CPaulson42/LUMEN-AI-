@@ -141,7 +141,7 @@ export default function PricingPage() {
           
           <button 
             className={`${styles.ctaButton} ${styles.secondary}`}
-            onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_ENTERPRISE, 'Scale')}
+            onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_SCALE, 'Scale')}
             disabled={isLoading !== null}
           >
             {isLoading === 'Scale' ? 'Loading...' : 'Subscribe to Scale'}

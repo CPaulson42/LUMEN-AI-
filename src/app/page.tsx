@@ -7,11 +7,16 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <section className={`${styles.hero} fade-in`}>
-        <h1>Your Ai Voice for the Future</h1>
-        <p>Lumen Leads empowers your agency with ultra-realistic AI voice agents that qualify leads, book appointments, and scale your outreach automatically.</p>
-        <Link href="/pricing" className={styles.ctaButton}>
-          Get Started
-        </Link>
+        <h1>Your AI Voice for the Future</h1>
+        <p>Traditional call centers are expensive, inconsistent, and hard to manage. Lumen AI provides ultra-realistic voice agents that never sleep, never miss a detail, and scale instantly to handle thousands of calls.</p>
+        <div className={styles.heroActions}>
+          <Link href="/pricing" className={styles.ctaButton}>
+            Get Started
+          </Link>
+          <a href="#demo" className={styles.secondaryCta}>
+            Try Live Demo
+          </a>
+        </div>
       </section>
 
       <section className={`${styles.featuresGrid} fade-in`} style={{ animationDelay: '0.1s' }}>
