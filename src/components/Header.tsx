@@ -77,7 +77,7 @@ export default function Header() {
           </div>
         </Link>
         <div className={styles.separator}></div>
-        <span className={styles.tagline}>Shedding light on hidden opportunities</span>
+        <span className={styles.tagline}>LATEST UPDATE: WHY LUMEN LIVE</span>
       </div>
 
       <nav className={styles.nav}>
