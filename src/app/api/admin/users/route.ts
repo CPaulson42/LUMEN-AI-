@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import Retell from 'retell-sdk';
 import Stripe from 'stripe';
 import { createClient as createServerClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
@@ -16,7 +15,6 @@ function getPriceToPlanMap(): Record<string, string> {
 
 export async function GET() {
   try {
-    // 1. Auth check
     const serverSupabase = await createServerClient();
     const { data: { user } } = await serverSupabase?.auth.getUser() || { data: { user: null } };
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -32,32 +30,21 @@ export async function GET() {
 
     const adminSupabase = createServiceClient(supabaseUrl, serviceRoleKey);
 
-    // 2. Run all three data fetches IN PARALLEL
-    const [authResult, profilesResult, callsResult] = await Promise.allSettled([
+    // Fetch users and profiles in parallel
+    const [authResult, profilesResult] = await Promise.allSettled([
       adminSupabase.auth.admin.listUsers(),
       adminSupabase.from('profiles').select('id, subscription_status, stripe_subscription_id'),
-      new Retell({ apiKey: process.env.RETELL_API_KEY || '' }).call.list({ filter_criteria: {} }),
     ]);
 
-    // Auth users
     if (authResult.status === 'rejected') {
       return NextResponse.json({ error: 'Failed to fetch auth users' }, { status: 500 });
     }
     const authUsers = (authResult.value as any).data?.users || [];
-
-    // Profiles
     const profiles: any[] = profilesResult.status === 'fulfilled'
       ? ((profilesResult.value as any).data || [])
       : [];
 
-    // Calls
-    const allCalls: any[] = callsResult.status === 'fulfilled'
-      ? (callsResult.value as any[] || [])
-      : [];
-
-    console.log('[AdminAPI] authUsers:', authUsers.length, '| profiles:', profiles.length, '| calls:', allCalls.length);
-
-    // 3. Resolve tier for each unique subscription ID from Stripe
+    // Resolve tier via Stripe price ID map
     const priceToPlan = getPriceToPlanMap();
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
       apiVersion: '2026-03-25.dahlia',
@@ -78,7 +65,6 @@ export async function GET() {
       })
     );
 
-    // Build profile map
     const profileMap: Record<string, { status: string; tier: string }> = {};
     for (const p of profiles) {
       let tier = 'Free';
@@ -94,31 +80,14 @@ export async function GET() {
       profileMap[p.id] = { status: p.subscription_status || 'free', tier };
     }
 
-    // 4. Calculate usage
-    let totalMs = 0;
-    const usageMap: Record<string, number> = {};
-    for (const c of allCalls) {
-      if (c.start_timestamp && c.end_timestamp) {
-        const dur = c.end_timestamp - c.start_timestamp;
-        totalMs += dur;
-        const uId = c.metadata?.user_id || c.retell_custom_call_data?.user_id || c.retell_custom_data?.user_id;
-        if (uId) {
-          usageMap[uId] = (usageMap[uId] || 0) + dur;
-        }
-      }
-    }
-    const globalMinutes = Math.ceil(totalMs / 60000);
-
-    // 5. Build response
     const usersData = authUsers.map((u: any) => ({
       id: u.id,
       email: u.email,
       status: profileMap[u.id]?.status || 'free',
       tier: profileMap[u.id]?.tier || 'Free',
-      minutesUsed: Math.ceil((usageMap[u.id] || 0) / 60000),
     }));
 
-    return NextResponse.json({ users: usersData, globalMinutes });
+    return NextResponse.json({ users: usersData });
   } catch (error) {
     console.error('Admin users fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch admin users' }, { status: 500 });

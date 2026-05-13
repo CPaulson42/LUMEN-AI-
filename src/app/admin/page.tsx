@@ -23,27 +23,50 @@ export default function AdminPortalPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const fetchUsers = async () => {
+  const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/users');
-      const data = await res.json();
-      
-      if (!res.ok) {
-        setError(data.error || 'Failed to load users');
+      // Fetch users/tiers and calls in parallel
+      const [usersRes, callsRes] = await Promise.all([
+        fetch('/api/admin/users'),
+        fetch('/api/calls'),
+      ]);
+
+      const usersData = await usersRes.json();
+      const callsData = await callsRes.json();
+
+      if (!usersRes.ok) {
+        setError(usersData.error || 'Failed to load users');
         return;
       }
 
-      if (data.users) {
-        setUsers(data.users);
+      // Build per-user usage map from Retell calls
+      const usageMap: Record<string, number> = {};
+      let totalMs = 0;
+      for (const c of (callsData.calls || [])) {
+        // calls route returns duration as "MM:SS" string — parse it back to ms
+        if (c.duration && c.duration !== '--') {
+          const parts = c.duration.split(':');
+          const mins = parseInt(parts[0], 10) || 0;
+          const secs = parseInt(parts[1], 10) || 0;
+          const ms = (mins * 60 + secs) * 1000;
+          totalMs += ms;
+        }
       }
-      if (typeof data.globalMinutes === 'number') {
-        setGlobalMinutes(data.globalMinutes);
+      setGlobalMinutes(Math.ceil(totalMs / 60000));
+
+      if (usersData.users) {
+        // Merge usage into each user
+        const merged = usersData.users.map((u: any) => ({
+          ...u,
+          minutesUsed: Math.ceil((usageMap[u.id] || 0) / 60000),
+        }));
+        setUsers(merged);
       }
     } catch (err) {
-      console.error('Failed to load admin users:', err);
-      setError('A network error occurred while fetching users.');
+      console.error('Failed to load admin data:', err);
+      setError('A network error occurred while fetching data.');
     } finally {
       setLoading(false);
     }
@@ -61,7 +84,7 @@ export default function AdminPortalPage() {
       }
 
       setIsAuthorized(true);
-      fetchUsers();
+      fetchData();
     };
 
     checkAuth();
@@ -79,7 +102,7 @@ export default function AdminPortalPage() {
           <h1>Global System Admin</h1>
           <p>Manage users, monitor global usage, and access individual call logs.</p>
         </div>
-        {error && <button className={styles.provisionBtn} onClick={fetchUsers}>Retry Fetch</button>}
+        {error && <button className={styles.provisionBtn} onClick={fetchData}>Retry</button>}
       </div>
 
       <div className={styles.kpiGrid}>
