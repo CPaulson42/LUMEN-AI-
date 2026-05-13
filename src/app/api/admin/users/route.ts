@@ -74,13 +74,11 @@ export async function GET() {
     }
 
     // Calculate usage per user id
-    const usageMap: Record<string, number> = {};
     if (allCalls.length > 0) {
       console.log('[AdminAPI] First call sample metadata:', JSON.stringify(allCalls[0].metadata));
       console.log('[AdminAPI] First call sample custom data:', JSON.stringify(allCalls[0].retell_custom_call_data));
     }
     
-    // Calculate usage per user id
     const usageMap: Record<string, number> = {};
     const retellUserIds = new Set<string>();
     
