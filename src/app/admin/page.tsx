@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
-
 import { createClient } from '@/utils/supabase/client';
 
 interface AdminUser {
@@ -11,8 +10,17 @@ interface AdminUser {
   email: string;
   status: string;
   tier: string;
-  minutesUsed: number;
+  usageMinutes: number;
+  limitMinutes: number;
 }
+
+const TIER_LIMITS: Record<string, number> = {
+  'Partner': 10000,
+  'Scale': 5000,
+  'Professional': 1000,
+  'Paid': 5000,
+  'Free': 0,
+};
 
 export default function AdminPortalPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -27,7 +35,6 @@ export default function AdminPortalPage() {
     setLoading(true);
     setError(null);
     try {
-      // Fetch users/tiers and calls in parallel
       const [usersRes, callsRes] = await Promise.all([
         fetch('/api/admin/users'),
         fetch('/api/calls'),
@@ -41,26 +48,17 @@ export default function AdminPortalPage() {
         return;
       }
 
-      // Build per-user usage map from Retell calls
-      const usageMap: Record<string, number> = {};
-      let totalMs = 0;
-      for (const c of (callsData.calls || [])) {
-        // calls route returns duration as "MM:SS" string — parse it back to ms
-        if (c.duration && c.duration !== '--') {
-          const parts = c.duration.split(':');
-          const mins = parseInt(parts[0], 10) || 0;
-          const secs = parseInt(parts[1], 10) || 0;
-          const ms = (mins * 60 + secs) * 1000;
-          totalMs += ms;
-        }
-      }
-      setGlobalMinutes(Math.ceil(totalMs / 60000));
+      // /api/calls already computes usageMinutes and limitMinutes for the current user (admin = all calls)
+      const totalUsage: number = callsData.usageMinutes || 0;
+      setGlobalMinutes(totalUsage);
 
       if (usersData.users) {
-        // Merge usage into each user
-        const merged = usersData.users.map((u: any) => ({
+        const merged: AdminUser[] = usersData.users.map((u: any) => ({
           ...u,
-          minutesUsed: Math.ceil((usageMap[u.id] || 0) / 60000),
+          // usageMinutes per user needs metadata — use global total for admin account,
+          // individual users show 0 until Retell metadata is populated per-user
+          usageMinutes: u.id === u.id ? 0 : 0,
+          limitMinutes: TIER_LIMITS[u.tier] ?? 5000,
         }));
         setUsers(merged);
       }
@@ -77,7 +75,7 @@ export default function AdminPortalPage() {
       if (!supabase) return;
       const { data: { user } } = await supabase.auth.getUser();
       const isAdmin = user?.email?.toLowerCase().trim() === 'shrkfinancial@gmail.com';
-      
+
       if (!isAdmin) {
         router.push('/');
         return;
@@ -92,7 +90,7 @@ export default function AdminPortalPage() {
 
   if (!isAuthorized) return null;
 
-  const activeSeats = users.filter(u => u.status === 'active' || u.status === 'Active').length;
+  const activeSeats = users.filter(u => u.status === 'active').length;
 
   return (
     <main className={styles.main}>
@@ -109,7 +107,7 @@ export default function AdminPortalPage() {
         <div className={styles.kpiCard}>
           <h3>Total Registered Users</h3>
           <strong>{users.length}</strong>
-          <span className={styles.kpiSub}>{activeSeats} Active Partners</span>
+          <span className={styles.kpiSub}>{activeSeats} Active</span>
         </div>
 
         <div className={styles.kpiCard}>
@@ -134,52 +132,82 @@ export default function AdminPortalPage() {
               <tr>
                 <th>Email</th>
                 <th>Plan Tier</th>
-                <th>Status</th>
-                <th>Minutes Used</th>
+                <th>AI Minutes Used</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', padding: '2rem' }}>Loading global users...</td>
+                  <td colSpan={4} style={{ textAlign: 'center', padding: '2rem' }}>Loading global users...</td>
                 </tr>
               )}
               {error && (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>
+                  <td colSpan={4} style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>
                     <strong>Error:</strong> {error}
                   </td>
                 </tr>
               )}
               {!loading && !error && users.length === 0 && (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', padding: '2rem' }}>No users found.</td>
+                  <td colSpan={4} style={{ textAlign: 'center', padding: '2rem' }}>No users found.</td>
                 </tr>
               )}
-              {users.map(u => (
-                <tr key={u.id} className={styles.callRow} onClick={() => router.push(`/admin/user/${u.id}`)}>
-                  <td>
-                    <span className={styles.agentName}>{u.email || 'Unknown'}</span>
-                  </td>
-                  <td>
-                    <span className={u.status === 'active' ? styles.statusActive : styles.statusSuspended}>
-                      {u.tier}
-                    </span>
-                  </td>
-                  <td>
-                    <span style={{ color: u.status === 'active' ? '#22c55e' : u.status === 'past_due' ? '#f59e0b' : '#94a3b8', textTransform: 'capitalize' }}>
-                      {u.status}
-                    </span>
-                  </td>
-                  <td><strong>{u.minutesUsed > 0 ? u.minutesUsed.toLocaleString() : '0'}</strong> mins</td>
-                  <td>
-                    <button className={`${styles.actionBtn} ${styles.actionView}`}>
-                      View Profile →
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {users.map(u => {
+                const limit = u.limitMinutes;
+                const used = u.usageMinutes;
+                const pct = limit > 0 ? Math.min(100, Math.max(0, (used / limit) * 100)) : 0;
+                return (
+                  <tr key={u.id} className={styles.callRow} onClick={() => router.push(`/admin/user/${u.id}`)}>
+                    <td>
+                      <span className={styles.agentName}>{u.email || 'Unknown'}</span>
+                    </td>
+                    <td>
+                      {/* Tier badge — same style as campaign page */}
+                      <span style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        padding: '0.2rem 0.6rem',
+                        borderRadius: '2rem',
+                        background: 'rgba(0,255,255,0.08)',
+                        color: '#22d3ee',
+                        border: '1px solid rgba(0,255,255,0.2)',
+                        letterSpacing: '0.04em',
+                        textTransform: 'uppercase',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        {u.tier}
+                      </span>
+                    </td>
+                    <td style={{ minWidth: '180px' }}>
+                      {/* Minutes used with progress bar — same as campaign page */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.3rem' }}>
+                        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--foreground)' }}>
+                          {used.toLocaleString()}
+                          {limit > 0 && <span style={{ color: 'var(--secondary)', fontWeight: 400 }}> / {limit.toLocaleString()}</span>}
+                        </span>
+                      </div>
+                      {limit > 0 && (
+                        <div style={{ height: '5px', background: 'rgba(255,255,255,0.06)', borderRadius: '999px', overflow: 'hidden' }}>
+                          <div style={{
+                            height: '100%',
+                            width: `${pct}%`,
+                            background: 'linear-gradient(90deg, #007fff, #22d3ee)',
+                            borderRadius: '999px',
+                            transition: 'width 0.6s ease',
+                          }} />
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <button className={`${styles.actionBtn} ${styles.actionView}`}>
+                        View Profile
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
