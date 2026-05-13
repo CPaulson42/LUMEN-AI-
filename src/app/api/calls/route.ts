@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server';
 import Retell from 'retell-sdk';
 import { createClient } from '@/utils/supabase/server';
 
-const retell = new Retell({
-  apiKey: process.env.RETELL_API_KEY || '',
-});
+const getRetellClient = () => {
+  return new Retell({
+    apiKey: process.env.RETELL_API_KEY || 'missing_key_check_env_vars',
+  });
+};
 
 export const dynamic = 'force-dynamic';
 
@@ -17,10 +19,12 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const isAdmin = user.email?.toLowerCase() === 'shrkfinancial@gmail.com';
+    const isAdmin = user.email?.toLowerCase().trim() === 'shrkfinancial@gmail.com';
+    console.log('[API/Calls] User Email:', user.email, '| isAdmin:', isAdmin);
 
     // Fetch calls. You can optionally pass filter_criteria in the object if needed.
     // E.g., retell.call.list({ filter_criteria: { agent_id: [...] } })
+    const retell = getRetellClient();
     const callResponse = await retell.call.list({ filter_criteria: {} });
 
     // Filter calls based on user privileges
