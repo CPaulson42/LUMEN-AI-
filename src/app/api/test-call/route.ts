@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const res = await fetch('https://api.retellai.com/v2/create-web-call', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${RETELL_API_KEY}`,
+        'Authorization': `Bearer ${RETELL_API_KEY?.trim()}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
 
     if (!res.ok) {
       const err = await res.text();
-      console.error('Retell create-web-call error:', err);
-      return NextResponse.json({ error: 'Failed to create web call' }, { status: res.status });
+      console.error('Retell create-web-call error:', res.status, err);
+      return NextResponse.json({ error: `Retell error ${res.status}: ${err}` }, { status: res.status });
     }
 
     const data = await res.json();
