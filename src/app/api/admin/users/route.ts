@@ -25,11 +25,19 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden. Admin access required.' }, { status: 403 });
     }
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error('[AdminAPI] Missing Supabase environment variables:', { 
+        url: !!supabaseUrl, 
+        key: !!serviceRoleKey 
+      });
+      return NextResponse.json({ error: 'System configuration error: Missing service role key.' }, { status: 500 });
+    }
+
     // Initialize Supabase Admin client using Service Role Key to bypass RLS
-    const adminSupabase = createServiceClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const adminSupabase = createServiceClient(supabaseUrl, serviceRoleKey);
 
     // Fetch all profiles
     const { data: profiles, error: profilesError } = await adminSupabase
