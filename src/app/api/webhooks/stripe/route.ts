@@ -48,13 +48,28 @@ export async function POST(req: NextRequest) {
       const subscriptionId = session.subscription as string;
       const customerId = session.customer as string;
 
+      // Retrieve the plan name from the Stripe subscription
+      let planName = 'active';
+      try {
+        if (subscriptionId) {
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+            expand: ['items.data.price.product'],
+          });
+          const product = subscription.items.data[0]?.price?.product as Stripe.Product;
+          if (product?.name) planName = product.name;
+        }
+      } catch (e) {
+        console.warn('Could not retrieve plan name from Stripe:', e);
+      }
+
       if (customerEmail) {
         const { error } = await supabaseAdmin
           .from('profiles')
           .update({ 
             stripe_customer_id: customerId,
             stripe_subscription_id: subscriptionId,
-            subscription_status: 'active'
+            subscription_status: 'active',
+            plan_name: planName,
           })
           .eq('email', customerEmail);
           

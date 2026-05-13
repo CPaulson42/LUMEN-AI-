@@ -21,6 +21,7 @@ interface UserProfile {
   id: string;
   email: string;
   status: string;
+  tier: string;
   minutesUsed: number;
 }
 
@@ -81,9 +82,12 @@ export default function UserDetailPage() {
           ← Back to User Management
         </Link>
         <div className={styles.userMeta}>
-          <h1>User: {userProfile.email}</h1>
+          <h1>{userProfile.email}</h1>
           <span className={`${styles.statusBadge} ${userProfile.status === 'active' ? styles.statusActive : styles.statusInactive}`}>
-            {userProfile.status}
+            {userProfile.tier}
+          </span>
+          <span style={{ marginLeft: '0.5rem', color: userProfile.status === 'active' ? '#22c55e' : '#94a3b8', fontSize: '0.8rem', textTransform: 'capitalize' }}>
+            ({userProfile.status})
           </span>
         </div>
         <div className={styles.topStats}>
@@ -153,11 +157,19 @@ export default function UserDetailPage() {
             <h3>Account Details</h3>
             <div className={styles.infoRow}>
               <span>User ID:</span>
-              <strong>{userProfile.id}</strong>
+              <strong style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>{userProfile.id}</strong>
             </div>
             <div className={styles.infoRow}>
-              <span>Status:</span>
-              <strong>{userProfile.status}</strong>
+              <span>Plan Tier:</span>
+              <strong>{userProfile.tier}</strong>
+            </div>
+            <div className={styles.infoRow}>
+              <span>Billing Status:</span>
+              <strong style={{ textTransform: 'capitalize' }}>{userProfile.status}</strong>
+            </div>
+            <div className={styles.infoRow}>
+              <span>Total Calls:</span>
+              <strong>{calls.length}</strong>
             </div>
           </div>
         </aside>

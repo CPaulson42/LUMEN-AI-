@@ -10,6 +10,7 @@ interface AdminUser {
   id: string;
   email: string;
   status: string;
+  tier: string;
   minutesUsed: number;
 }
 
@@ -105,10 +106,10 @@ export default function AdminPortalPage() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>User ID</th>
                 <th>Email</th>
-                <th>Status (Tier)</th>
-                <th>Total Usage</th>
+                <th>Plan Tier</th>
+                <th>Status</th>
+                <th>Minutes Used</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -132,19 +133,23 @@ export default function AdminPortalPage() {
               )}
               {users.map(u => (
                 <tr key={u.id} className={styles.callRow} onClick={() => router.push(`/admin/user/${u.id}`)}>
-                  <td style={{ fontFamily: 'monospace', color: 'var(--secondary)' }}>{u.id.split('-')[0]}...</td>
                   <td>
                     <span className={styles.agentName}>{u.email || 'Unknown'}</span>
                   </td>
                   <td>
                     <span className={u.status === 'active' ? styles.statusActive : styles.statusSuspended}>
-                      {u.status || 'inactive'}
+                      {u.tier}
                     </span>
                   </td>
-                  <td><strong>{u.minutesUsed.toLocaleString()}</strong> mins</td>
+                  <td>
+                    <span style={{ color: u.status === 'active' ? '#22c55e' : u.status === 'past_due' ? '#f59e0b' : '#94a3b8', textTransform: 'capitalize' }}>
+                      {u.status}
+                    </span>
+                  </td>
+                  <td><strong>{u.minutesUsed > 0 ? u.minutesUsed.toLocaleString() : '0'}</strong> mins</td>
                   <td>
                     <button className={`${styles.actionBtn} ${styles.actionView}`}>
-                      View Full Profile →
+                      View Profile →
                     </button>
                   </td>
                 </tr>

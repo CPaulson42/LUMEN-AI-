@@ -59,9 +59,12 @@ export async function GET() {
       console.log('[AdminAPI] First profile sample data:', JSON.stringify(profiles[0]));
     }
 
-    const profileMap: Record<string, string> = {};
-    (profiles || []).forEach(p => {
-      profileMap[p.id] = p.subscription_status;
+    const profileMap: Record<string, { status: string; planName: string }> = {};
+    (profiles || []).forEach((p: any) => {
+      profileMap[p.id] = {
+        status: p.subscription_status || 'free',
+        planName: p.plan_name || p.subscription_status || 'Free',
+      };
     });
 
     // Fetch all global calls from Retell
@@ -101,10 +104,12 @@ export async function GET() {
     const usersData = (authUsers || []).map((u: any) => {
       const ms = usageMap[u.id] || 0;
       const minutesUsed = Math.ceil(ms / 60000);
+      const profile = profileMap[u.id];
       return {
         id: u.id,
         email: u.email,
-        status: profileMap[u.id] || 'free', // Fallback to free if no profile
+        status: profile?.status || 'free',
+        tier: profile?.planName || 'Free',
         minutesUsed,
       };
     });
