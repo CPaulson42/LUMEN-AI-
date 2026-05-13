@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './page.module.css';
 
+import { createClient } from '@/utils/supabase/client';
+
 interface Call {
   id: string;
   name: string;
@@ -28,11 +30,23 @@ export default function UserDetailPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [calls, setCalls] = useState<Call[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const supabase = createClient();
 
   useEffect(() => {
     if (!id) return;
 
-    const fetchData = async () => {
+    const checkAuthAndFetch = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const isAdmin = user?.email?.toLowerCase().trim() === 'shrkfinancial@gmail.com';
+      
+      if (!isAdmin) {
+        router.push('/');
+        return;
+      }
+
+      setIsAuthorized(true);
+
       try {
         // Fetch users to find this specific one (simpler than a new endpoint for now)
         const userRes = await fetch('/api/admin/users');
@@ -51,8 +65,10 @@ export default function UserDetailPage() {
       }
     };
 
-    fetchData();
-  }, [id]);
+    checkAuthAndFetch();
+  }, [id, router, supabase]);
+
+  if (!isAuthorized) return null;
 
   if (loading) return <div className={styles.loading}>Loading user profile...</div>;
   if (!userProfile) return <div className={styles.error}>User not found.</div>;

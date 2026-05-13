@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
+import { createClient } from '@/utils/supabase/client';
+
 interface AdminUser {
   id: string;
   email: string;
@@ -14,22 +16,39 @@ interface AdminUser {
 export default function AdminPortalPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
-    fetch('/api/admin/users')
-      .then(res => res.json())
-      .then(data => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const isAdmin = user?.email?.toLowerCase().trim() === 'shrkfinancial@gmail.com';
+      
+      if (!isAdmin) {
+        router.push('/');
+        return;
+      }
+
+      setIsAuthorized(true);
+
+      try {
+        const res = await fetch('/api/admin/users');
+        const data = await res.json();
         if (data.users) {
           setUsers(data.users);
         }
-        setLoading(false);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error('Failed to load admin users:', err);
+      } finally {
         setLoading(false);
-      });
-  }, []);
+      }
+    };
+
+    checkAuth();
+  }, [router, supabase]);
+
+  if (!isAuthorized) return null;
 
   const totalMinutes = users.reduce((acc, curr) => acc + curr.minutesUsed, 0);
   const activeSeats = users.filter(u => u.status === 'active').length;

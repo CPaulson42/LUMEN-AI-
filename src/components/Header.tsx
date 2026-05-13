@@ -114,12 +114,14 @@ export default function Header() {
             >
               Billing
             </Link>
-            <Link
-              href="/admin"
-              className={`${styles.navLink} ${pathname?.startsWith('/admin') ? styles.active : ''}`}
-            >
-              Admin Portal
-            </Link>
+            {user.email?.toLowerCase().trim() === 'shrkfinancial@gmail.com' && (
+              <Link
+                href="/admin"
+                className={`${styles.navLink} ${pathname?.startsWith('/admin') ? styles.active : ''}`}
+              >
+                Admin Portal
+              </Link>
+            )}
             <Link
               href="/partner"
               className={`${styles.navLink} ${pathname?.startsWith('/partner') ? styles.active : ''}`}
