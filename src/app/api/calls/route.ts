@@ -83,8 +83,11 @@ export async function GET() {
     const usageMinutes = Math.ceil(totalUsageMs / 60000);
 
     // Get user profile to determine limits
-    const { data: profile } = await supabase.from('profiles').select('subscription_status').eq('id', user.id).single();
-    const isPartner = profile?.subscription_status === 'active';
+    let isPartner = false;
+    if (supabase) {
+      const { data: profile } = await supabase.from('profiles').select('subscription_status').eq('id', user.id).single();
+      isPartner = profile?.subscription_status === 'active';
+    }
     const limitMinutes = isPartner ? 10000 : 5000;
 
     return NextResponse.json({ calls: recentCalls, usageMinutes, limitMinutes });
