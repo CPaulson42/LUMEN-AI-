@@ -39,17 +39,25 @@ export async function GET() {
     // Initialize Supabase Admin client using Service Role Key to bypass RLS
     const adminSupabase = createServiceClient(supabaseUrl, serviceRoleKey);
 
-    // Fetch all profiles
-    const { data: profiles, error: profilesError } = await adminSupabase
-      .from('profiles')
-      .select('id, email, subscription_status, updated_at');
-
-    if (profilesError) {
-      console.error('Failed to fetch global profiles:', profilesError);
-      return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
+    // Fetch all users from Auth (requires service role)
+    const { data: { users: authUsers }, error: authError } = await adminSupabase.auth.admin.listUsers();
+    
+    if (authError) {
+      console.error('[AdminAPI] Auth list error:', authError);
+      return NextResponse.json({ error: 'Failed to fetch auth users' }, { status: 500 });
     }
 
-    console.log('[AdminAPI] Profiles found:', profiles?.length || 0);
+    console.log('[AdminAPI] Auth users found:', authUsers?.length || 0);
+
+    // Fetch all profiles to get subscription status
+    const { data: profiles } = await adminSupabase
+      .from('profiles')
+      .select('id, subscription_status');
+
+    const profileMap: Record<string, string> = {};
+    (profiles || []).forEach(p => {
+      profileMap[p.id] = p.subscription_status;
+    });
 
     // Fetch all global calls from Retell
     const retell = getRetellClient();
@@ -59,7 +67,6 @@ export async function GET() {
       console.log('[AdminAPI] Global calls found:', allCalls?.length || 0);
     } catch (e) {
       console.warn('Failed to fetch Retell calls for admin dashboard:', e);
-      // We will gracefully continue with 0 minutes if Retell fails
     }
 
     // Calculate usage per user id
@@ -72,14 +79,14 @@ export async function GET() {
       }
     }
 
-    // Combine profile data with usage
-    const usersData = (profiles || []).map((p: any) => {
-      const ms = usageMap[p.id] || 0;
+    // Combine Auth data with Profile data and Usage
+    const usersData = (authUsers || []).map((u: any) => {
+      const ms = usageMap[u.id] || 0;
       const minutesUsed = Math.ceil(ms / 60000);
       return {
-        id: p.id,
-        email: p.email,
-        status: p.subscription_status,
+        id: u.id,
+        email: u.email,
+        status: profileMap[u.id] || 'free', // Fallback to free if no profile
         minutesUsed,
       };
     });

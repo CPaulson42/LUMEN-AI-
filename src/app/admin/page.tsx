@@ -16,9 +16,33 @@ interface AdminUser {
 export default function AdminPortalPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const router = useRouter();
   const supabase = createClient();
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/admin/users');
+      const data = await res.json();
+      
+      if (!res.ok) {
+        setError(data.error || 'Failed to load users');
+        return;
+      }
+
+      if (data.users) {
+        setUsers(data.users);
+      }
+    } catch (err) {
+      console.error('Failed to load admin users:', err);
+      setError('A network error occurred while fetching users.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -32,18 +56,7 @@ export default function AdminPortalPage() {
       }
 
       setIsAuthorized(true);
-
-      try {
-        const res = await fetch('/api/admin/users');
-        const data = await res.json();
-        if (data.users) {
-          setUsers(data.users);
-        }
-      } catch (err) {
-        console.error('Failed to load admin users:', err);
-      } finally {
-        setLoading(false);
-      }
+      fetchUsers();
     };
 
     checkAuth();
@@ -52,7 +65,7 @@ export default function AdminPortalPage() {
   if (!isAuthorized) return null;
 
   const totalMinutes = users.reduce((acc, curr) => acc + curr.minutesUsed, 0);
-  const activeSeats = users.filter(u => u.status === 'active').length;
+  const activeSeats = users.filter(u => u.status === 'active' || u.status === 'Active').length;
 
   return (
     <main className={styles.main}>
@@ -62,6 +75,7 @@ export default function AdminPortalPage() {
           <h1>Global System Admin</h1>
           <p>Manage users, monitor global usage, and access individual call logs.</p>
         </div>
+        {error && <button className={styles.provisionBtn} onClick={fetchUsers}>Retry Fetch</button>}
       </div>
 
       <div className={styles.kpiGrid}>
@@ -104,7 +118,14 @@ export default function AdminPortalPage() {
                   <td colSpan={5} style={{ textAlign: 'center', padding: '2rem' }}>Loading global users...</td>
                 </tr>
               )}
-              {!loading && users.length === 0 && (
+              {error && (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>
+                    <strong>Error:</strong> {error}
+                  </td>
+                </tr>
+              )}
+              {!loading && !error && users.length === 0 && (
                 <tr>
                   <td colSpan={5} style={{ textAlign: 'center', padding: '2rem' }}>No users found.</td>
                 </tr>
