@@ -16,6 +16,21 @@ const getStripeClient = () => {
   });
 };
 
+// Map known Stripe price IDs to plan names
+function getPriceToPlanMap(): Record<string, string> {
+  const map: Record<string, string> = {};
+  if (process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PROFESSIONAL) {
+    map[process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PROFESSIONAL] = 'Professional';
+  }
+  if (process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_SCALE) {
+    map[process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_SCALE] = 'Scale';
+  }
+  if (process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PARTNER) {
+    map[process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PARTNER] = 'Partner';
+  }
+  return map;
+}
+
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
@@ -47,78 +62,57 @@ export async function GET() {
       return NextResponse.json({ error: `Auth Error: ${authError.message}` }, { status: 500 });
     }
 
-    // Fetch all profiles — select everything we know exists from the webhook
-    const { data: profiles, error: profilesError } = await adminSupabase
+    // Fetch all profiles
+    const { data: profiles } = await adminSupabase
       .from('profiles')
       .select('id, email, subscription_status, stripe_customer_id, stripe_subscription_id');
 
-    if (profilesError) {
-      console.error('[AdminAPI] profiles fetch error:', profilesError);
-    }
+    const priceToPlan = getPriceToPlanMap();
 
-    console.log('[AdminAPI] Sample profile:', JSON.stringify(profiles?.[0]));
-
-    // Use Stripe to resolve the real plan name for each unique subscription ID
+    // Resolve tier for each profile via Stripe subscription -> price ID -> plan name
     const stripe = getStripeClient();
-    const subToPlanName: Record<string, string> = {};
-
-    const uniqueSubIds = [
-      ...new Set(
-        (profiles || [])
-          .map((p: any) => p.stripe_subscription_id)
-          .filter(Boolean) as string[]
-      ),
-    ];
-
-    console.log('[AdminAPI] Subscription IDs to resolve:', uniqueSubIds);
+    const profileMap: Record<string, { status: string; tier: string }> = {};
 
     await Promise.all(
-      uniqueSubIds.map(async (subId: string) => {
-        try {
-          const subscription = await stripe.subscriptions.retrieve(subId, {
-            expand: ['items.data.price.product'],
-          });
-          const product = subscription.items.data[0]?.price?.product as Stripe.Product;
-          if (product?.name) {
-            subToPlanName[subId] = product.name;
-            console.log(`[AdminAPI] Resolved ${subId} -> ${product.name}`);
+      (profiles || []).map(async (p: any) => {
+        let tier = 'Free';
+
+        if (p.stripe_subscription_id) {
+          try {
+            const subscription = await stripe.subscriptions.retrieve(p.stripe_subscription_id);
+            const priceId = subscription.items.data[0]?.price?.id;
+            if (priceId && priceToPlan[priceId]) {
+              tier = priceToPlan[priceId];
+            } else if (p.subscription_status === 'active') {
+              tier = 'Paid';
+            }
+          } catch {
+            // Stripe lookup failed — fall back to subscription status
+            if (p.subscription_status === 'active') tier = 'Paid';
+            else if (p.subscription_status === 'past_due') tier = 'Past Due';
+            else if (p.subscription_status === 'canceled') tier = 'Canceled';
           }
-        } catch (e) {
-          console.warn(`[AdminAPI] Could not fetch plan for sub ${subId}:`, e);
+        } else if (p.subscription_status === 'active') {
+          tier = 'Paid';
         }
+
+        profileMap[p.id] = {
+          status: p.subscription_status || 'free',
+          tier,
+        };
       })
     );
-
-    // Build profile map keyed by user id
-    const profileMap: Record<string, { status: string; tier: string }> = {};
-    (profiles || []).forEach((p: any) => {
-      let tier = 'Free';
-      if (p.stripe_subscription_id && subToPlanName[p.stripe_subscription_id]) {
-        tier = subToPlanName[p.stripe_subscription_id];
-      } else if (p.subscription_status === 'active') {
-        tier = 'Active (Plan Unknown)';
-      } else if (p.subscription_status === 'past_due') {
-        tier = 'Past Due';
-      } else if (p.subscription_status === 'canceled') {
-        tier = 'Canceled';
-      }
-      profileMap[p.id] = {
-        status: p.subscription_status || 'free',
-        tier,
-      };
-    });
 
     // Fetch all calls from Retell for usage calculation
     const retell = getRetellClient();
     let allCalls: any[] = [];
     try {
       allCalls = await retell.call.list({ filter_criteria: {} });
-      console.log('[AdminAPI] Retell calls fetched:', allCalls.length);
     } catch (e) {
       console.warn('[AdminAPI] Failed to fetch Retell calls:', e);
     }
 
-    // Map usage in milliseconds per user_id
+    // Map usage per user
     const usageMap: Record<string, number> = {};
     for (const c of allCalls) {
       const uId =
@@ -131,7 +125,7 @@ export async function GET() {
       }
     }
 
-    // Combine everything into the response
+    // Combine everything
     const usersData = (authUsers || []).map((u: any) => {
       const ms = usageMap[u.id] || 0;
       const minutesUsed = Math.ceil(ms / 60000);
