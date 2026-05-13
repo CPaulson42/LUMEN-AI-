@@ -44,7 +44,7 @@ export async function GET() {
     
     if (authError) {
       console.error('[AdminAPI] Auth list error:', authError);
-      return NextResponse.json({ error: 'Failed to fetch auth users' }, { status: 500 });
+      return NextResponse.json({ error: `Auth Error: ${authError.message}` }, { status: 500 });
     }
 
     console.log('[AdminAPI] Auth users found:', authUsers?.length || 0);
