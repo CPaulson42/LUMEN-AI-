@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "check-voices.js",
+    "setup-partner.js",
+    "setup-stripe.js",
+    "scratch/**",
   ]),
 ]);
 

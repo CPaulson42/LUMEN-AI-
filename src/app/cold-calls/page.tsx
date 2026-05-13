@@ -41,9 +41,27 @@ export default function ColdCalls() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const retellClientRef = useRef<RetellWebClient | null>(null);
 
-  // Fetch Retell agents on mount
+  const [mics, setMics] = useState<MediaDeviceInfo[]>([]);
+  const [selectedMic, setSelectedMic] = useState<string>('');
+
   useEffect(() => {
-    getCampaigns().then(setCampaigns);
+    // Request permission silently to get real device labels
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        navigator.mediaDevices.enumerateDevices().then(devices => {
+          const audioInputs = devices.filter(d => d.kind === 'audioinput');
+          setMics(audioInputs);
+          if (audioInputs.length > 0) setSelectedMic(audioInputs[0].deviceId);
+        });
+        setTimeout(() => stream.getTracks().forEach(t => t.stop()), 1000);
+      })
+      .catch(err => console.warn('Microphone permission initially denied or not available.', err));
+
+    const init = async () => {
+      const data = await getCampaigns();
+      setCampaigns(data);
+    };
+    init();
 
     fetch('/api/agents')
       .then(res => res.json())
@@ -54,22 +72,48 @@ export default function ColdCalls() {
         }
       })
       .catch(err => console.error('Failed to load Retell agents:', err));
+
+    // Initialize exactly once on the client side
+    const client = new RetellWebClient();
+    retellClientRef.current = client;
+
+    client.on('call_started', () => {
+      console.log('Call started successfully');
+      setCallActive(true);
+    });
+    client.on('call_ended', () => {
+      console.log('Call ended');
+      setCallActive(false);
+    });
+    client.on('error', (err) => {
+      console.error('Retell error:', err);
+      setCallActive(false);
+      alert('Call error: ' + err.message);
+    });
+    client.on('update', (update) => {
+      console.log('Call update:', update);
+    });
+    client.on('agent_start_talking', () => {
+      console.log('Agent started talking');
+    });
+    client.on('agent_stop_talking', () => {
+      console.log('Agent stopped talking');
+    });
+
+    return () => {
+      client.stopCall();
+      client.removeAllListeners();
+    };
   }, []);
 
   const selectedAgent = agents.find(a => a.agent_id === selectedAgentId);
 
   const handleTestAgent = async () => {
     if (!selectedAgentId) return;
+    if (!retellClientRef.current) return;
     setIsTesting(true);
-    try {
-      // Force microphone permission prompt before anything else and release the stream immediately
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop());
-      } else {
-        throw new Error("Microphone access is not supported in this browser or requires HTTPS.");
-      }
 
+    try {
       const res = await fetch('/api/test-call', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -78,37 +122,11 @@ export default function ColdCalls() {
       const data = await res.json();
       if (!res.ok || !data.accessToken) throw new Error(data.error || 'Failed to start call');
 
-      const client = new RetellWebClient();
-      retellClientRef.current = client;
-
-      client.on('call_started', () => {
-        console.log('Call started successfully');
-        setCallActive(true);
-      });
-      client.on('call_ended', () => {
-        console.log('Call ended');
-        setCallActive(false);
-        retellClientRef.current = null;
-      });
-      client.on('error', (err) => {
-        console.error('Retell error:', err);
-        setCallActive(false);
-        alert('Call error: ' + err.message);
-      });
-      client.on('update', (update) => {
-        console.log('Call update:', update);
-      });
-      client.on('agent_start_talking', () => {
-        console.log('Agent started talking');
-      });
-      client.on('agent_stop_talking', () => {
-        console.log('Agent stopped talking');
-      });
-
-      await client.startCall({ accessToken: data.accessToken });
-    } catch (err: any) {
+      await retellClientRef.current.startCall({ accessToken: data.accessToken });
+    } catch (err) {
       console.error('Test call failed:', err);
-      alert('Failed to start test call: ' + err.message);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      alert('Failed to start test call: ' + message);
     } finally {
       setIsTesting(false);
     }
@@ -119,7 +137,7 @@ export default function ColdCalls() {
       alert('Please select an agent and enter a valid phone number.');
       return;
     }
-    
+
     setIsDialing(true);
     try {
       const res = await fetch('/api/make-call', {
@@ -129,12 +147,13 @@ export default function ColdCalls() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to initiate phone call');
-      
+
       alert('Outbound call initiated successfully! The entered phone number should ring shortly.');
       setManualDialNumber('');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Manual dial failed:', err);
-      alert('Failed to initiate call: ' + err.message);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      alert('Failed to initiate call: ' + message);
     } finally {
       setIsDialing(false);
     }
@@ -155,7 +174,7 @@ export default function ColdCalls() {
       try {
         const parsed = JSON.parse(trimmed);
         if (Array.isArray(parsed)) {
-          rawEntries = parsed.map((item: any) => String(item).trim());
+          rawEntries = parsed.map((item: unknown) => String(item).trim());
         }
       } catch {
         // Not valid JSON — strip brackets and split manually
@@ -249,7 +268,7 @@ export default function ColdCalls() {
 
   const handleLaunchCampaign = async () => {
     const newCampId = crypto.randomUUID();
-    const newCamp: any = {
+    const newCamp: Campaign = {
       id: newCampId,
       name: campaignName || 'New Campaign',
       lead_source: leadSource,
@@ -262,7 +281,7 @@ export default function ColdCalls() {
       progress: 0,
       leads: dailyVolume,
     };
-    
+
     await saveCampaign(newCamp);
     setCampaigns(await getCampaigns());
     setShowNewCampaignModal(false);
@@ -391,23 +410,38 @@ export default function ColdCalls() {
                 </select>
               </div>
 
+              <div className={styles.configField}>
+                <label>Microphone</label>
+                <select 
+                  className={styles.select} 
+                  value={selectedMic} 
+                  onChange={(e) => setSelectedMic(e.target.value)}
+                  style={{ backgroundColor: '#000000', color: '#3b82f6', borderColor: '#3b82f6' }}
+                >
+                  {mics.length === 0 ? <option value="">Default Microphone</option> : null}
+                  {mics.map(m => (
+                    <option key={m.deviceId} value={m.deviceId}>{m.label || `Microphone ${m.deviceId.slice(0,4)}`}</option>
+                  ))}
+                </select>
+              </div>
+
               <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                 <h4 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem' }}>Live Outbound Test</h4>
                 <p style={{ fontSize: '0.75rem', color: 'var(--secondary)', marginBottom: '1rem' }}>Enter a real phone number to test the AI agent over the phone network.</p>
-                
+
                 <div className={styles.configField}>
                   <label>Phone Number (with +1)</label>
-                  <input 
-                    type="text" 
-                    className={styles.input} 
-                    placeholder="+1 555 123 4567" 
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="+1 555 123 4567"
                     value={manualDialNumber}
                     onChange={(e) => setManualDialNumber(e.target.value)}
                   />
                 </div>
-                
-                <button 
-                  className={styles.primaryButton} 
+
+                <button
+                  className={styles.primaryButton}
                   style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                   onClick={handleManualDial}
                   disabled={isDialing || !manualDialNumber}

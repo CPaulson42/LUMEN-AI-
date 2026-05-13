@@ -6,7 +6,7 @@ import { createClient } from '@/utils/supabase/server'
 
 import { cookies } from 'next/headers'
 
-export async function login(prevState: any, formData: FormData) {
+export async function login(prevState: unknown, formData: FormData) {
   const supabase = await createClient()
   if (!supabase) return { error: 'Database connection not configured.' }
 
@@ -25,7 +25,7 @@ export async function login(prevState: any, formData: FormData) {
   redirect('/cold-calls')
 }
 
-export async function signup(prevState: any, formData: FormData) {
+export async function signup(prevState: unknown, formData: FormData) {
   const supabase = await createClient()
   if (!supabase) return { error: 'Database connection not configured.' }
 

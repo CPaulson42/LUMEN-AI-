@@ -1,0 +1,6 @@
+check-voices.js
+setup-partner.js
+setup-stripe.js
+scratch/
+node_modules/
+.next/

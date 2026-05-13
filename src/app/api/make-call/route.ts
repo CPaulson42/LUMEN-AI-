@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Retell from 'retell-sdk';
+import { createClient } from '@/utils/supabase/server';
 
 export async function POST(req: NextRequest) {
   const retell = new Retell({
     apiKey: process.env.RETELL_API_KEY || '',
   });
   try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase?.auth.getUser() || { data: { user: null } };
+
     const { agentId, toNumber } = await req.json();
 
     if (!agentId || !toNumber) {
@@ -20,16 +24,25 @@ export async function POST(req: NextRequest) {
 
     const fromNumber = phoneNumbers[0].phone_number;
 
-    // 2. Initiate the outbound phone call
-    const callResponse = await retell.call.createPhoneCall({
+    const payload: any = {
       from_number: fromNumber,
       to_number: toNumber,
       override_agent_id: agentId, // Use the selected agent for this specific call
-    });
+    };
+
+    if (user) {
+      payload.retell_custom_call_data = { user_id: user.id };
+      payload.retell_custom_data = { user_id: user.id };
+      payload.metadata = { user_id: user.id };
+    }
+
+    // 2. Initiate the outbound phone call
+    const callResponse = await retell.call.createPhoneCall(payload);
 
     return NextResponse.json({ success: true, callId: callResponse.call_id });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Phone call error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to initiate phone call' }, { status: 500 });
+    const err = error as { message?: string };
+    return NextResponse.json({ error: err.message || 'Failed to initiate phone call' }, { status: 500 });
   }
 }

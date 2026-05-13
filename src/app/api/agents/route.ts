@@ -34,7 +34,7 @@ export async function GET() {
     );
 
     return NextResponse.json({ agents: results });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Retell fetch error:', error);
     // Return fallback agents so UI still works
     return NextResponse.json({

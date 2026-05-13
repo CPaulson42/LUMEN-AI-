@@ -5,6 +5,16 @@ import Link from 'next/link';
 import { getCampaignById, type Campaign } from '@/lib/campaigns';
 import styles from './page.module.css';
 
+interface Lead {
+  name: string;
+  phone: string;
+  status: string;
+  duration: string;
+  result: string | null;
+  summary: string;
+  transcript: { speaker: string; text: string; time: string }[];
+}
+
 // Mock database for specific lead calls and their transcripts
 const LEAD_DATABASE = {
   '1': {
@@ -46,23 +56,87 @@ const LEAD_DATABASE = {
 export default function LeadDetailPage({ params }: { params: Promise<{ id: string; leadId: string }> }) {
   const { id: campaignId, leadId } = use(params);
   const [campaign, setCampaign] = useState<Campaign | null>(null);
+  const [realLeadData, setRealLeadData] = useState<Lead | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getCampaignById(campaignId).then(setCampaign);
   }, [campaignId]);
   
-  // @ts-ignore
-  const leadData = LEAD_DATABASE[leadId] || {
-    name: 'Unknown Lead',
-    phone: '--',
-    status: 'Unknown',
-    duration: '--',
-    result: null,
-    summary: 'No data available for this lead ID.',
-    transcript: []
-  };
+  useEffect(() => {
+    const fetchRealData = async () => {
+      try {
+        setIsLoading(true);
+        // If it starts with call_, it's a Retell call
+        if (leadId.startsWith('call_')) {
+          const res = await fetch(`/api/calls/${leadId}`);
+          if (res.ok) {
+            const data = await res.json();
+            
+            // Parse transcript
+            let transcriptParsed: { speaker: string; text: string; time: string }[] = [];
+            if (data.transcript_object && Array.isArray(data.transcript_object)) {
+              transcriptParsed = data.transcript_object.map((t: any) => {
+                // Determine start time in mm:ss
+                const totalSeconds = Math.floor(t.words?.[0]?.start || 0);
+                const mm = Math.floor(totalSeconds / 60);
+                const ss = String(totalSeconds % 60).padStart(2, '0');
+                return {
+                  speaker: t.role === 'agent' ? 'ai' : 'user',
+                  text: t.content,
+                  time: `${mm}:${ss}`
+                };
+              });
+            } else if (data.transcript) {
+              // Fallback to raw transcript text if needed
+              transcriptParsed = [{ speaker: 'system', text: data.transcript, time: '0:00' }];
+            }
+
+            const durationMs = data.end_timestamp && data.start_timestamp ? (data.end_timestamp - data.start_timestamp) : 0;
+            const mm = Math.floor(durationMs / 60000);
+            const ss = String(Math.floor((durationMs / 1000) % 60)).padStart(2, '0');
+
+            setRealLeadData({
+              name: data.to_number || 'Web Caller',
+              phone: data.from_number || data.to_number || 'Web Call',
+              status: data.call_status === 'ended' ? 'Completed' : 'In Progress',
+              duration: `${mm}:${ss}`,
+              result: data.call_analysis?.call_successful ? 'qualified' : 'not_interested',
+              summary: data.call_analysis?.call_summary || 'No summary available.',
+              transcript: transcriptParsed
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load real lead data', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchRealData();
+  }, [leadId]);
+
+  // Merge mock data or real data
+  let leadData = (LEAD_DATABASE as Record<string, Lead>)[leadId];
+  if (realLeadData) {
+    leadData = realLeadData;
+  } else if (!leadData && !isLoading) {
+    leadData = {
+      name: 'Unknown Lead',
+      phone: '--',
+      status: 'Unknown',
+      duration: '--',
+      result: null,
+      summary: 'No data available for this lead ID.',
+      transcript: []
+    };
+  }
 
   const campaignName = campaign?.name ?? 'Campaign';
+
+  if (isLoading && !leadData) {
+    return <main className={styles.main}><div className={styles.container}>Loading call details...</div></main>;
+  }
 
   return (
     <main className={styles.main}>
@@ -125,11 +199,11 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
             
             <div className={styles.transcriptList}>
               {leadData.transcript.length > 0 ? (
-                leadData.transcript.map((msg: any, i: number) => (
-                  <div key={i} className={`${styles.messageRow} ${msg.speaker === 'ai' ? styles.ai : styles.user}`}>
+                leadData.transcript.map((msg: { speaker: string; text: string; time: string }, i: number) => (
+                  <div key={i} className={`${styles.messageRow} ${msg.speaker === 'ai' ? styles.ai : msg.speaker === 'system' ? styles.system : styles.user}`}>
                     <div className={styles.messageBubble}>
                       <span className={styles.messageMeta}>
-                        {msg.speaker === 'ai' ? 'Alex (AI Agent)' : leadData.name} • {msg.time}
+                        {msg.speaker === 'ai' ? 'AI Agent' : msg.speaker === 'system' ? 'System' : leadData.name} • {msg.time}
                       </span>
                       <div className={styles.messageContent}>
                         {msg.text}
@@ -139,7 +213,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                 ))
               ) : (
                 <div style={{ textAlign: 'center', color: 'var(--secondary)', marginTop: '2rem' }}>
-                  No transcript data available.
+                  No transcript data available yet. It may take a few seconds after the call ends to appear.
                 </div>
               )}
             </div>

@@ -30,9 +30,10 @@ export default function PricingPage() {
         console.error(data.error);
         setErrorMsg('Checkout Error: ' + (data.error || 'Unknown error'));
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      setErrorMsg('Network Error: ' + error.message);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      setErrorMsg('Network Error: ' + message);
     } finally {
       setIsLoading(null);
     }
@@ -74,7 +75,7 @@ export default function PricingPage() {
             </div>
             <div className={styles.featureItem}>
               <CheckIcon />
-              <span>Premium "Ultra-Realistic" Voices</span>
+              <span>Premium &quot;Ultra-Realistic&quot; Voices</span>
             </div>
             <div className={styles.featureItem}>
               <CheckIcon />
@@ -170,7 +171,7 @@ export default function PricingPage() {
             </div>
             <div className={styles.featureItem}>
               <CheckIcon />
-              <span><strong>Partner Admin Panel</strong> — Full Downline Management</span>
+              <span><strong>Partner Admin Panel</strong> &mdash; Full Downline Management</span>
             </div>
             <div className={styles.featureItem}>
               <CheckIcon />

@@ -7,32 +7,34 @@ import { createClient } from '@/utils/supabase/client';
 export default function PartnerDashboard() {
   const [copied, setCopied] = useState(false);
   const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [isVerifiedPartner, setIsVerifiedPartner] = useState(false);
   const [loading, setLoading] = useState(true);
   const [host, setHost] = useState('');
 
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
-    setHost(window.location.origin);
-
-    async function fetchProfile() {
+    async function init() {
+      setHost(window.location.origin);
+      
       if (!supabase) return;
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data, error } = await supabase
           .from('profiles')
-          .select('referral_code')
+          .select('referral_code, subscription_status')
           .eq('id', user.id)
           .single();
         
-        if (data?.referral_code) {
-          setReferralCode(data.referral_code);
+        if (data) {
+          if (data.referral_code) setReferralCode(data.referral_code);
+          if (data.subscription_status === 'active') setIsVerifiedPartner(true);
         }
       }
       setLoading(false);
     }
 
-    fetchProfile();
+    init();
   }, [supabase]);
 
   const affiliateLink = referralCode 
@@ -68,15 +70,31 @@ export default function PartnerDashboard() {
       <div className={styles.headerRow}>
         <h1 className={styles.title}>Partner Revenue Share</h1>
         <div className={styles.affiliateCard}>
-          <span className={styles.affiliateLabel}>Your Referral Link:</span>
-          <span className={styles.affiliateLink} style={{ fontSize: '0.85rem' }}>{affiliateLink}</span>
-          <button 
-            className={styles.copyBtn} 
-            onClick={handleCopy}
-            disabled={!referralCode}
-          >
-            {copied ? 'Copied!' : 'Copy Link'}
-          </button>
+          {isVerifiedPartner ? (
+            <>
+              <span className={styles.affiliateLabel}>Your Referral Link:</span>
+              <span className={styles.affiliateLink} style={{ fontSize: '0.85rem' }}>{affiliateLink}</span>
+              <button 
+                className={styles.copyBtn} 
+                onClick={handleCopy}
+                disabled={!referralCode}
+              >
+                {copied ? 'Copied!' : 'Copy Link'}
+              </button>
+            </>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+              <span className={styles.affiliateLabel} style={{ marginBottom: 0 }}>Unlock Your Referral Link</span>
+              <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', textAlign: 'center' }}>Become a verified partner by upgrading to an active plan.</span>
+              <button 
+                className={styles.copyBtn} 
+                onClick={() => window.location.href = '/pricing'}
+                style={{ marginTop: '0.5rem' }}
+              >
+                Upgrade to Partner
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

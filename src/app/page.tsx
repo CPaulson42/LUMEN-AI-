@@ -77,7 +77,7 @@ export default function Home() {
             </svg>
           </div>
           <h3>Consistency Compounds</h3>
-          <p>Unlike human agents who have good days and bad days, AI maintains the same professional energy and messaging on every single call. No more calling when I’m tired, frustrated, or distracted. Every prospect gets the same high-quality experience.</p>
+          <p>Unlike human agents who have good days and bad days, AI maintains the same professional energy and messaging on every single call. No more calling when I&apos;m tired, frustrated, or distracted. Every prospect gets the same high-quality experience.</p>
         </div>
         <div className={`${styles.featureCard} glass-panel premium-card`}>
           <div className={styles.iconWrapper}>
@@ -94,13 +94,13 @@ export default function Home() {
       <section className={`${styles.processSection} fade-in`} style={{ animationDelay: '0.15s' }}>
         <div className={styles.processHeader}>
           <h2>Our process</h2>
-          <p>Clear, fast, and accountable. You’ll always know what’s happening and when.</p>
+          <p>Clear, fast, and accountable. You&apos;ll always know what&apos;s happening and when.</p>
         </div>
         <div className={styles.processGrid}>
           <div className={`${styles.processStep} glass-panel premium-card`}>
             <div className={styles.stepNumber}>01</div>
             <h3>Discovery</h3>
-            <p>10–15 min call. Goals, call flows, systems. We scope the quickest path to value.</p>
+            <p>10&ndash;15 min call. Goals, call flows, systems. We scope the quickest path to value.</p>
           </div>
           <div className={`${styles.processStep} glass-panel premium-card`}>
             <div className={styles.stepNumber}>02</div>
@@ -124,7 +124,7 @@ export default function Home() {
         <div className={`${styles.demoCard} glass-panel`}>
           <div className={styles.demoLeft}>
             <h2 className={styles.demoTitle}>Try a live demo call</h2>
-            <p className={styles.demoSubtitle}>Enter your details and our AI voice agent will call you. You'll hear how it greets, qualifies, and books in under 2 minutes.</p>
+            <p className={styles.demoSubtitle}>Enter your details and our AI voice agent will call you. You&apos;ll hear how it greets, qualifies, and books in under 2 minutes.</p>
             <form className={styles.demoForm} onSubmit={(e) => e.preventDefault()}>
               <div className={styles.demoFieldRow}>
                 <div className={styles.demoField}>
@@ -159,7 +159,7 @@ export default function Home() {
               <div className={styles.challengeCard}>
                 <div className={styles.challengeHeader}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                  <span>The "Try to Break Me" Challenge</span>
+                  <span>The &quot;Try to Break Me&quot; Challenge</span>
                 </div>
                 <p>Call the number and try to change your order three times in 30 seconds. See if our AI keeps up.</p>
               </div>
@@ -170,7 +170,7 @@ export default function Home() {
               <div className={styles.demoTrustItem}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 <div>
-                  <strong>Typical setup: 7–14 days</strong>
+                  <strong>Typical setup: 7&ndash;14 days</strong>
                   <span>From signed agreement to live calls</span>
                 </div>
               </div>
@@ -190,8 +190,8 @@ export default function Home() {
               </div>
             </div>
             <div className={styles.demoQuote}>
-              <p>"The demo call blew our team away — it sounded completely natural."</p>
-              <span>— Insurance Agency Owner, Florida</span>
+              <p>&quot;The demo call blew our team away &mdash; it sounded completely natural.&quot;</p>
+              <span>&mdash; Insurance Agency Owner, Florida</span>
             </div>
           </div>
         </div>

@@ -57,11 +57,9 @@ export async function POST(req: NextRequest) {
         'Content-Length': audioBuffer.byteLength.toString(),
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('TTS API Error:', error);
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    const err = error as { message?: string };
+    return NextResponse.json({ error: err.message || 'TTS generation failed' }, { status: 500 });
   }
 }

@@ -7,20 +7,21 @@ import * as React from 'react';
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import { User } from '@supabase/supabase-js';
 import styles from './Header.module.css';
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [dark, setDark] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     if (!supabase) return;
 
-    // Check active session
+    // Check active session on mount and when pathname changes
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
     });
@@ -31,18 +32,21 @@ export default function Header() {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, [supabase, pathname]);
 
   // Load persisted preference on mount
   useEffect(() => {
     const saved = localStorage.getItem('lumen_theme');
-    if (saved === 'dark') {
-      setDark(true);
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else if (saved === 'light') {
-      setDark(false);
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
+    const initTheme = () => {
+      if (saved === 'dark') {
+        setDark(true);
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else if (saved === 'light') {
+        setDark(false);
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    };
+    initTheme();
   }, []);
 
   const toggleTheme = () => {
@@ -86,7 +90,7 @@ export default function Header() {
             href="/cold-calls"
             className={`${styles.navLink} ${pathname?.startsWith('/cold-calls') ? styles.active : ''}`}
           >
-            Cold Calls
+            Agent Calls
           </Link>
         ) : (
           <Link

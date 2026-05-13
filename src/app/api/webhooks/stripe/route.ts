@@ -29,10 +29,11 @@ export async function POST(req: NextRequest) {
 
   try {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-  } catch (err: any) {
-    console.error(`⚠️  Webhook signature verification failed:`, err.message);
+  } catch (err) {
+    const error = err as { message: string };
+    console.error(`⚠️  Webhook signature verification failed:`, error.message);
     return NextResponse.json(
-      { error: `Webhook Error: ${err.message}` },
+      { error: `Webhook Error: ${error.message}` },
       { status: 400 }
     );
   }
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
     }
 
     case 'invoice.paid': {
-      const invoice = event.data.object as any;
+      const invoice = event.data.object as Stripe.Invoice;
       const customerId = invoice.customer as string;
 
       const { error } = await supabaseAdmin
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
     }
 
     case 'invoice.payment_failed': {
-      const invoice = event.data.object as any;
+      const invoice = event.data.object as Stripe.Invoice;
       const customerId = invoice.customer as string;
 
       const { error } = await supabaseAdmin

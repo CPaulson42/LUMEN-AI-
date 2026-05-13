@@ -85,7 +85,7 @@ export default function SeatDetailPage({ params }: { params: Promise<{ id: strin
           <div className={`${styles.card} premium-card`} style={{ marginTop: '2rem' }}>
             <h2>Recent Activity</h2>
             <p style={{ color: 'var(--secondary)', fontSize: '0.875rem' }}>
-              Agent was last active today at 2:14 PM viewing "Q2 Life Insurance Core" leads.
+              Agent was last active today at 2:14 PM viewing &quot;Q2 Life Insurance Core&quot; leads.
             </p>
           </div>
         </div>

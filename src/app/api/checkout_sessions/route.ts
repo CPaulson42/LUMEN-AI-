@@ -3,7 +3,6 @@ import Stripe from 'stripe';
 
 export async function POST(req: NextRequest) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-    // @ts-ignore - Let stripe auto-detect the best version
     apiVersion: undefined,
   });
   try {
@@ -34,10 +33,11 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (err: any) {
+  } catch (err) {
+    const error = err as { message: string; statusCode?: number };
     return NextResponse.json(
-      { error: err.message },
-      { status: err.statusCode || 500 }
+      { error: error.message },
+      { status: error.statusCode || 500 }
     );
   }
 }

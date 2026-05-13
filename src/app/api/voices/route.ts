@@ -1,4 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+
+interface Voice {
+  voice_id: string;
+  name: string;
+  labels?: {
+    gender?: string;
+    accent?: string;
+    use_case?: string;
+    description?: string;
+  };
+  preview_url?: string;
+}
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
@@ -20,7 +32,7 @@ export async function GET() {
     const data = await res.json();
 
     // Map to a cleaner format for the frontend
-    const voices = (data.voices || []).map((v: any) => ({
+    const voices = (data.voices || []).map((v: Voice) => ({
       voice_id: v.voice_id,
       name: v.name,
       gender: v.labels?.gender || 'unknown',
@@ -31,7 +43,7 @@ export async function GET() {
     }));
 
     // Add Jonathan Livingston voice manually if it's not already in the list
-    if (!voices.some((v: any) => v.voice_id === 'PIGsltMj3gFMR34aFDI3')) {
+    if (!voices.some((v: { voice_id: string }) => v.voice_id === 'PIGsltMj3gFMR34aFDI3')) {
       voices.push({
         voice_id: 'PIGsltMj3gFMR34aFDI3',
         name: 'Jonathan Livingston - Authentic, Calming & Pleasing',
@@ -44,9 +56,10 @@ export async function GET() {
     }
 
     return NextResponse.json({ voices });
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as { message?: string };
     return NextResponse.json(
-      { error: error.message },
+      { error: err.message || 'Failed to fetch voices' },
       { status: 500 }
     );
   }

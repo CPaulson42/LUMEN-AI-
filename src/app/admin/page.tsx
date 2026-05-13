@@ -39,7 +39,7 @@ export default function AdminPortalPage() {
       <div className={styles.header}>
         <div>
           <h1>Partner Admin Console</h1>
-          <p>Manage your organization's sub-agents, monitor global usage, and allocate campaign lines.</p>
+          <p>Manage your organization&apos;s sub-agents, monitor global usage, and allocate campaign lines.</p>
         </div>
         <button className={styles.provisionBtn} onClick={handleProvision}>
           + Provision New Seat
