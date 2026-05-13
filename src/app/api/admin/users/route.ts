@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
 import Retell from 'retell-sdk';
+import Stripe from 'stripe';
 import { createClient as createServerClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 
 const getRetellClient = () => {
   const apiKey = process.env.RETELL_API_KEY?.trim() || 'missing_key_check_env_vars';
-  return new Retell({
-    apiKey,
+  return new Retell({ apiKey });
+};
+
+const getStripeClient = () => {
+  return new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+    apiVersion: '2026-03-25.dahlia',
   });
 };
 
@@ -30,77 +35,96 @@ export async function GET() {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.replace(/\s/g, '');
 
     if (!supabaseUrl || !serviceRoleKey) {
-      console.error('[AdminAPI] Missing Supabase environment variables:', { 
-        url: !!supabaseUrl, 
-        key: !!serviceRoleKey 
-      });
       return NextResponse.json({ error: 'System configuration error: Missing service role key.' }, { status: 500 });
     }
 
-    // Initialize Supabase Admin client using Service Role Key to bypass RLS
     const adminSupabase = createServiceClient(supabaseUrl, serviceRoleKey);
 
-    // Fetch all users from Auth (requires service role)
+    // Fetch all users from Supabase Auth
     const { data: { users: authUsers }, error: authError } = await adminSupabase.auth.admin.listUsers();
-    
     if (authError) {
-      console.error('[AdminAPI] Auth list error:', authError);
       return NextResponse.json({ error: `Auth Error: ${authError.message}` }, { status: 500 });
     }
 
-    console.log('[AdminAPI] Auth users found:', authUsers?.length || 0);
-
-    // Fetch all profiles to get subscription status
+    // Fetch all profiles
     const { data: profiles } = await adminSupabase
       .from('profiles')
-      .select('*');
+      .select('id, subscription_status, stripe_subscription_id, plan_name');
 
-    if (profiles && profiles.length > 0) {
-      console.log('[AdminAPI] First profile sample data:', JSON.stringify(profiles[0]));
-    }
+    // Build a map of subscription_id -> plan name by querying Stripe once per unique sub
+    const stripe = getStripeClient();
+    const subToPlanName: Record<string, string> = {};
 
-    const profileMap: Record<string, { status: string; planName: string }> = {};
+    const uniqueSubIds = [...new Set(
+      (profiles || [])
+        .map((p: any) => p.stripe_subscription_id)
+        .filter(Boolean)
+    )];
+
+    await Promise.all(
+      uniqueSubIds.map(async (subId: string) => {
+        // If plan_name already stored, use it
+        const existingProfile = (profiles || []).find((p: any) => p.stripe_subscription_id === subId);
+        if (existingProfile?.plan_name) {
+          subToPlanName[subId] = existingProfile.plan_name;
+          return;
+        }
+        // Otherwise look it up from Stripe
+        try {
+          const subscription = await stripe.subscriptions.retrieve(subId, {
+            expand: ['items.data.price.product'],
+          });
+          const product = subscription.items.data[0]?.price?.product as Stripe.Product;
+          if (product?.name) {
+            subToPlanName[subId] = product.name;
+            // Backfill plan_name in DB so we don't need to look it up next time
+            await adminSupabase
+              .from('profiles')
+              .update({ plan_name: product.name })
+              .eq('stripe_subscription_id', subId);
+          }
+        } catch (e) {
+          console.warn(`[AdminAPI] Could not fetch plan name for sub ${subId}:`, e);
+        }
+      })
+    );
+
+    // Build profile map
+    const profileMap: Record<string, { status: string; tier: string }> = {};
     (profiles || []).forEach((p: any) => {
+      let tier = 'Free';
+      if (p.stripe_subscription_id && subToPlanName[p.stripe_subscription_id]) {
+        tier = subToPlanName[p.stripe_subscription_id];
+      } else if (p.plan_name) {
+        tier = p.plan_name;
+      } else if (p.subscription_status === 'active') {
+        tier = 'Paid';
+      }
       profileMap[p.id] = {
         status: p.subscription_status || 'free',
-        planName: p.plan_name || p.subscription_status || 'Free',
+        tier,
       };
     });
 
-    // Fetch all global calls from Retell
+    // Fetch all global calls from Retell for usage calculation
     const retell = getRetellClient();
     let allCalls: any[] = [];
     try {
       allCalls = await retell.call.list({ filter_criteria: {} });
-      console.log('[AdminAPI] Global calls found:', allCalls?.length || 0);
     } catch (e) {
-      console.warn('Failed to fetch Retell calls for admin dashboard:', e);
+      console.warn('[AdminAPI] Failed to fetch Retell calls:', e);
     }
 
-    // Calculate usage per user id
-    if (allCalls.length > 0) {
-      console.log('[AdminAPI] First call sample metadata:', JSON.stringify(allCalls[0].metadata));
-      console.log('[AdminAPI] First call sample custom data:', JSON.stringify(allCalls[0].retell_custom_call_data));
-    }
-    
     const usageMap: Record<string, number> = {};
-    const retellUserIds = new Set<string>();
-    
     for (const c of allCalls) {
       const uId = c.metadata?.user_id || c.retell_custom_call_data?.user_id || c.retell_custom_data?.user_id;
-      if (uId) {
-        retellUserIds.add(uId);
-        if (c.start_timestamp && c.end_timestamp) {
-          if (!usageMap[uId]) usageMap[uId] = 0;
-          usageMap[uId] += (c.end_timestamp - c.start_timestamp);
-        }
+      if (uId && c.start_timestamp && c.end_timestamp) {
+        if (!usageMap[uId]) usageMap[uId] = 0;
+        usageMap[uId] += (c.end_timestamp - c.start_timestamp);
       }
     }
 
-    console.log('[AdminAPI] Unique user_ids in Retell calls:', Array.from(retellUserIds));
-    console.log('[AdminAPI] Target auth user IDs:', (authUsers || []).map(u => u.id));
-
-    // Combine Auth data with Profile data and Usage
+    // Combine everything
     const usersData = (authUsers || []).map((u: any) => {
       const ms = usageMap[u.id] || 0;
       const minutesUsed = Math.ceil(ms / 60000);
@@ -109,7 +133,7 @@ export async function GET() {
         id: u.id,
         email: u.email,
         status: profile?.status || 'free',
-        tier: profile?.planName || 'Free',
+        tier: profile?.tier || 'Free',
         minutesUsed,
       };
     });
