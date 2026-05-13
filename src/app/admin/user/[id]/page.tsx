@@ -37,6 +37,7 @@ export default function UserDetailPage() {
     if (!id) return;
 
     const checkAuthAndFetch = async () => {
+      if (!supabase) return;
       const { data: { user } } = await supabase.auth.getUser();
       const isAdmin = user?.email?.toLowerCase().trim() === 'shrkfinancial@gmail.com';
       

@@ -22,6 +22,7 @@ export default function AdminPortalPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
+      if (!supabase) return;
       const { data: { user } } = await supabase.auth.getUser();
       const isAdmin = user?.email?.toLowerCase().trim() === 'shrkfinancial@gmail.com';
       
