@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const sig = req.headers.get('stripe-signature');
 
   if (!sig) {
-    console.error('⚠️  Webhook Error: Missing stripe-signature header.');
+    console.error('Webhook Error: Missing stripe-signature header.');
     return NextResponse.json(
       { error: 'Missing stripe-signature header' },
       { status: 400 }
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err) {
     const error = err as { message: string };
-    console.error(`⚠️  Webhook signature verification failed:`, error.message);
+    console.error('Webhook signature verification failed:', error.message);
     return NextResponse.json(
       { error: `Webhook Error: ${error.message}` },
       { status: 400 }
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Successfully constructed event — now handle it.
-  console.log(`✅ Webhook received: ${event.type}`);
+  console.log('Webhook received:', event.type);
 
   switch (event.type) {
     case 'checkout.session.completed': {
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
     }
 
     default:
-      console.log(`ℹ️  Unhandled event type: ${event.type}`);
+      console.log('Unhandled event type:', event.type);
   }
 
   return NextResponse.json({ received: true });
