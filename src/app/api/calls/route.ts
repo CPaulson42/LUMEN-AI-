@@ -41,12 +41,14 @@ export async function GET(request: Request) {
         return metadataUserId === user.id || customDataUserId === user.id || phoneCustomDataUserId === user.id;
       });
     } else if (specificUserId) {
+      console.log('[API/Calls] Filtering for specific user:', specificUserId);
       filteredCalls = filteredCalls.filter((c: any) => {
         const metadataUserId = c.metadata?.user_id;
         const customDataUserId = c.retell_custom_call_data?.user_id;
         const phoneCustomDataUserId = c.retell_custom_data?.user_id;
         return metadataUserId === specificUserId || customDataUserId === specificUserId || phoneCustomDataUserId === specificUserId;
       });
+      console.log('[API/Calls] Filtered calls length:', filteredCalls.length);
     }
     
     // Sort calls so the newest are first

@@ -41,11 +41,14 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
     }
 
+    console.log('[AdminAPI] Profiles found:', profiles?.length || 0);
+
     // Fetch all global calls from Retell
     const retell = getRetellClient();
     let allCalls: any[] = [];
     try {
       allCalls = await retell.call.list({ filter_criteria: {} });
+      console.log('[AdminAPI] Global calls found:', allCalls?.length || 0);
     } catch (e) {
       console.warn('Failed to fetch Retell calls for admin dashboard:', e);
       // We will gracefully continue with 0 minutes if Retell fails
