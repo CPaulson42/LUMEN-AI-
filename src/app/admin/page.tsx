@@ -18,6 +18,7 @@ export default function AdminPortalPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [globalMinutes, setGlobalMinutes] = useState(0);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -36,6 +37,9 @@ export default function AdminPortalPage() {
 
       if (data.users) {
         setUsers(data.users);
+      }
+      if (typeof data.globalMinutes === 'number') {
+        setGlobalMinutes(data.globalMinutes);
       }
     } catch (err) {
       console.error('Failed to load admin users:', err);
@@ -65,7 +69,6 @@ export default function AdminPortalPage() {
 
   if (!isAuthorized) return null;
 
-  const totalMinutes = users.reduce((acc, curr) => acc + curr.minutesUsed, 0);
   const activeSeats = users.filter(u => u.status === 'active' || u.status === 'Active').length;
 
   return (
@@ -88,7 +91,7 @@ export default function AdminPortalPage() {
 
         <div className={styles.kpiCard}>
           <h3>Global AI Minutes</h3>
-          <strong>{totalMinutes.toLocaleString()}</strong>
+          <strong>{globalMinutes.toLocaleString()}</strong>
           <span className={styles.kpiSub}>Total volume across all accounts</span>
         </div>
 

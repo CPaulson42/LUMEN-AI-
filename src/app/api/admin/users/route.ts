@@ -112,9 +112,13 @@ export async function GET() {
       console.warn('[AdminAPI] Failed to fetch Retell calls:', e);
     }
 
-    // Map usage per user
+    // Map usage per user (requires metadata match) + total across all calls
     const usageMap: Record<string, number> = {};
+    let totalMs = 0;
     for (const c of allCalls) {
+      if (c.start_timestamp && c.end_timestamp) {
+        totalMs += c.end_timestamp - c.start_timestamp;
+      }
       const uId =
         c.metadata?.user_id ||
         c.retell_custom_call_data?.user_id ||
@@ -124,6 +128,7 @@ export async function GET() {
         usageMap[uId] += c.end_timestamp - c.start_timestamp;
       }
     }
+    const globalMinutes = Math.ceil(totalMs / 60000);
 
     // Combine everything
     const usersData = (authUsers || []).map((u: any) => {
@@ -139,7 +144,7 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ users: usersData });
+    return NextResponse.json({ users: usersData, globalMinutes });
   } catch (error) {
     console.error('Admin users fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch admin users' }, { status: 500 });
