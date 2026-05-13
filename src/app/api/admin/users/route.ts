@@ -52,7 +52,11 @@ export async function GET() {
     // Fetch all profiles to get subscription status
     const { data: profiles } = await adminSupabase
       .from('profiles')
-      .select('id, subscription_status');
+      .select('*');
+
+    if (profiles && profiles.length > 0) {
+      console.log('[AdminAPI] First profile sample data:', JSON.stringify(profiles[0]));
+    }
 
     const profileMap: Record<string, string> = {};
     (profiles || []).forEach(p => {
@@ -71,13 +75,28 @@ export async function GET() {
 
     // Calculate usage per user id
     const usageMap: Record<string, number> = {};
+    if (allCalls.length > 0) {
+      console.log('[AdminAPI] First call sample metadata:', JSON.stringify(allCalls[0].metadata));
+      console.log('[AdminAPI] First call sample custom data:', JSON.stringify(allCalls[0].retell_custom_call_data));
+    }
+    
+    // Calculate usage per user id
+    const usageMap: Record<string, number> = {};
+    const retellUserIds = new Set<string>();
+    
     for (const c of allCalls) {
       const uId = c.metadata?.user_id || c.retell_custom_call_data?.user_id || c.retell_custom_data?.user_id;
-      if (uId && c.start_timestamp && c.end_timestamp) {
-        if (!usageMap[uId]) usageMap[uId] = 0;
-        usageMap[uId] += (c.end_timestamp - c.start_timestamp);
+      if (uId) {
+        retellUserIds.add(uId);
+        if (c.start_timestamp && c.end_timestamp) {
+          if (!usageMap[uId]) usageMap[uId] = 0;
+          usageMap[uId] += (c.end_timestamp - c.start_timestamp);
+        }
       }
     }
+
+    console.log('[AdminAPI] Unique user_ids in Retell calls:', Array.from(retellUserIds));
+    console.log('[AdminAPI] Target auth user IDs:', (authUsers || []).map(u => u.id));
 
     // Combine Auth data with Profile data and Usage
     const usersData = (authUsers || []).map((u: any) => {
