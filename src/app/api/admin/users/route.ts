@@ -4,8 +4,9 @@ import { createClient as createServerClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 
 const getRetellClient = () => {
+  const apiKey = process.env.RETELL_API_KEY?.trim() || 'missing_key_check_env_vars';
   return new Retell({
-    apiKey: process.env.RETELL_API_KEY || 'missing_key_check_env_vars',
+    apiKey,
   });
 };
 
