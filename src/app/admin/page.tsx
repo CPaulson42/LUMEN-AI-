@@ -1,116 +1,110 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
-// Mock sub-agent database
-const MOCK_AGENTS = [
-  { id: 1, name: 'Michael Chen', email: 'michael@lumenseats.com', status: 'Active', minutesUsed: 1420, campaign: 'Q2 Life Insurance Core' },
-  { id: 2, name: 'Sarah Jenkins', email: 'sarah.j@lumenseats.com', status: 'Active', minutesUsed: 890, campaign: 'Term Life Pilot' },
-  { id: 3, name: 'David Rodriguez', email: 'david.r@lumenseats.com', status: 'Suspended', minutesUsed: 45, campaign: '--' },
-  { id: 4, name: 'Emma Wilson', email: 'emma@lumenseats.com', status: 'Active', minutesUsed: 3100, campaign: 'High Net Worth Outbound' },
-  { id: 5, name: 'James Taylor', email: 'james.t@lumenseats.com', status: 'Active', minutesUsed: 420, campaign: 'Q2 Life Insurance Core' },
-];
+interface AdminUser {
+  id: string;
+  email: string;
+  status: string;
+  minutesUsed: number;
+}
 
 export default function AdminPortalPage() {
-  const [agents, setAgents] = useState(MOCK_AGENTS);
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const toggleStatus = (id: number) => {
-    setAgents(prev => prev.map(agent => {
-      if (agent.id === id) {
-        return { ...agent, status: agent.status === 'Active' ? 'Suspended' : 'Active' };
-      }
-      return agent;
-    }));
-  };
+  useEffect(() => {
+    fetch('/api/admin/users')
+      .then(res => res.json())
+      .then(data => {
+        if (data.users) {
+          setUsers(data.users);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to load admin users:', err);
+        setLoading(false);
+      });
+  }, []);
 
-  const handleProvision = () => {
-    alert("Backend Integration Required: This will open a modal to invite a new agent to your organization via email.");
-  };
-
-  const totalMinutes = agents.reduce((acc, curr) => acc + curr.minutesUsed, 0);
-  const activeSeats = agents.filter(a => a.status === 'Active').length;
+  const totalMinutes = users.reduce((acc, curr) => acc + curr.minutesUsed, 0);
+  const activeSeats = users.filter(u => u.status === 'active').length;
 
   return (
     <main className={styles.main}>
 
       <div className={styles.header}>
         <div>
-          <h1>Partner Admin Console</h1>
-          <p>Manage your organization&apos;s sub-agents, monitor global usage, and allocate campaign lines.</p>
+          <h1>Global System Admin</h1>
+          <p>Manage users, monitor global usage, and access individual call logs.</p>
         </div>
-        <button className={styles.provisionBtn} onClick={handleProvision}>
-          + Provision New Seat
-        </button>
       </div>
 
       <div className={styles.kpiGrid}>
         <div className={styles.kpiCard}>
-          <h3>Allocated Seats</h3>
-          <strong>{activeSeats} <span style={{ fontSize: '1.25rem', color: 'var(--secondary)' }}>/ 100</span></strong>
-          <span className={styles.kpiSub}>95 Seats Remaining</span>
+          <h3>Total Registered Users</h3>
+          <strong>{users.length}</strong>
+          <span className={styles.kpiSub}>{activeSeats} Active Partners</span>
         </div>
 
         <div className={styles.kpiCard}>
-          <h3>Global AI Minutes (MTD)</h3>
+          <h3>Global AI Minutes</h3>
           <strong>{totalMinutes.toLocaleString()}</strong>
-          <span className={styles.kpiSub}>~ $881.25 Overage Equivalent</span>
+          <span className={styles.kpiSub}>Total volume across all accounts</span>
         </div>
 
         <div className={styles.kpiCard}>
-          <h3>Active Telephony Lines</h3>
-          <strong>4</strong>
-          <span className={styles.kpiSub}>Max Concurrency: 50</span>
+          <h3>System Status</h3>
+          <strong>Online</strong>
+          <span className={styles.kpiSub}>Retell API Connected</span>
         </div>
       </div>
 
       <div className={styles.tableSection}>
-        <h2>Seat Management</h2>
+        <h2>User Management</h2>
 
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Agent</th>
-                <th>Status</th>
-                <th>MTD Usage</th>
-                <th>Active Campaign</th>
+                <th>User ID</th>
+                <th>Email</th>
+                <th>Status (Tier)</th>
+                <th>Total Usage</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {agents.map(agent => (
-                <tr key={agent.id}>
+              {loading && (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '2rem' }}>Loading global users...</td>
+                </tr>
+              )}
+              {!loading && users.length === 0 && (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '2rem' }}>No users found.</td>
+                </tr>
+              )}
+              {users.map(u => (
+                <tr key={u.id} className={styles.callRow} onClick={() => router.push(`/admin/user/${u.id}`)}>
+                  <td style={{ fontFamily: 'monospace', color: 'var(--secondary)' }}>{u.id.split('-')[0]}...</td>
                   <td>
-                    <div className={styles.agentMeta}>
-                      <span className={styles.agentName}>{agent.name}</span>
-                      <span className={styles.agentEmail}>{agent.email}</span>
-                    </div>
+                    <span className={styles.agentName}>{u.email || 'Unknown'}</span>
                   </td>
                   <td>
-                    <span className={agent.status === 'Active' ? styles.statusActive : styles.statusSuspended}>
-                      {agent.status}
+                    <span className={u.status === 'active' ? styles.statusActive : styles.statusSuspended}>
+                      {u.status || 'inactive'}
                     </span>
                   </td>
-                  <td><strong>{agent.minutesUsed.toLocaleString()}</strong> mins</td>
-                  <td style={{ color: 'var(--secondary)' }}>{agent.campaign}</td>
+                  <td><strong>{u.minutesUsed.toLocaleString()}</strong> mins</td>
                   <td>
-                    <div className={styles.actionRow}>
-                      <button 
-                        className={`${styles.actionBtn} ${styles.actionView}`}
-                        onClick={() => router.push(`/admin/seat/${agent.id}`)}
-                      >
-                        View Details
-                      </button>
-                      <button
-                        className={`${styles.actionBtn} ${styles.actionSuspend}`}
-                        onClick={() => toggleStatus(agent.id)}
-                      >
-                        {agent.status === 'Active' ? 'Suspend' : 'Reactivate'}
-                      </button>
-                    </div>
+                    <button className={`${styles.actionBtn} ${styles.actionView}`}>
+                      View Full Profile →
+                    </button>
                   </td>
                 </tr>
               ))}

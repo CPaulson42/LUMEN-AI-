@@ -10,8 +10,11 @@ const getRetellClient = () => {
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const specificUserId = searchParams.get('userId');
+
     const supabase = await createClient();
     const { data: { user } } = await supabase?.auth.getUser() || { data: { user: null } };
 
@@ -26,6 +29,7 @@ export async function GET() {
     // E.g., retell.call.list({ filter_criteria: { agent_id: [...] } })
     const retell = getRetellClient();
     const callResponse = await retell.call.list({ filter_criteria: {} });
+    console.log('[API/Calls] Fetched from Retell:', callResponse?.length || 0, 'calls');
 
     // Filter calls based on user privileges
     let filteredCalls = [...callResponse];
@@ -35,6 +39,13 @@ export async function GET() {
         const customDataUserId = c.retell_custom_call_data?.user_id;
         const phoneCustomDataUserId = c.retell_custom_data?.user_id;
         return metadataUserId === user.id || customDataUserId === user.id || phoneCustomDataUserId === user.id;
+      });
+    } else if (specificUserId) {
+      filteredCalls = filteredCalls.filter((c: any) => {
+        const metadataUserId = c.metadata?.user_id;
+        const customDataUserId = c.retell_custom_call_data?.user_id;
+        const phoneCustomDataUserId = c.retell_custom_data?.user_id;
+        return metadataUserId === specificUserId || customDataUserId === specificUserId || phoneCustomDataUserId === specificUserId;
       });
     }
     

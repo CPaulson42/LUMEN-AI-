@@ -1,0 +1,223 @@
+.main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.loading, .error {
+  padding: 4rem;
+  text-align: center;
+  font-size: 1.25rem;
+  color: var(--secondary);
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.25rem 4rem;
+  background: rgba(5, 5, 5, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--glass-border);
+  flex-wrap: wrap;
+}
+
+.backLink {
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.userMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.userMeta h1 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.statusBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.4rem;
+}
+
+.statusActive {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.statusInactive {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.topStats {
+  display: flex;
+  gap: 2rem;
+}
+
+.topStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.topStat span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--secondary);
+  letter-spacing: 0.05em;
+}
+
+.topStat strong {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem 4rem;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.callSection {
+  flex: 3;
+}
+
+.sidebar {
+  flex: 1;
+  min-width: 280px;
+}
+
+.callTableCard {
+  padding: 1.75rem;
+}
+
+.sectionHeader h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 1.5rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--secondary);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.table td {
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 0.8125rem;
+}
+
+.callRow {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.callRow:hover {
+  background: rgba(0, 102, 255, 0.1);
+}
+
+.nameCell {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.phoneCell, .durationCell {
+  color: var(--secondary);
+  font-family: monospace;
+}
+
+/* Status Pills */
+.statusInProgress {
+  padding: 0.2rem 0.5rem;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+  border-radius: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.statusQualified {
+  padding: 0.2rem 0.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-radius: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.statusNotInterested {
+  padding: 0.2rem 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-radius: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.statusQueued {
+  padding: 0.2rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--secondary);
+  border-radius: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.resultGood { color: #10b981; font-weight: 700; }
+.resultBad { color: #ef4444; font-weight: 700; }
+.resultPending { color: var(--secondary); }
+
+.infoCard {
+  padding: 1.5rem;
+}
+
+.infoCard h3 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.infoRow span { color: var(--secondary); }
+.infoRow strong { color: var(--foreground); word-break: break-all; }
+
+@media (max-width: 1024px) {
+  .container { flex-direction: column; }
+  .sidebar { width: 100%; }
+}
