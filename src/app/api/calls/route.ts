@@ -17,7 +17,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const isAdmin = user.email === 'shrkfinancial@gmail.com';
+    const isAdmin = user.email?.toLowerCase() === 'shrkfinancial@gmail.com';
 
     // Fetch calls. You can optionally pass filter_criteria in the object if needed.
     // E.g., retell.call.list({ filter_criteria: { agent_id: [...] } })
@@ -41,8 +41,8 @@ export async function GET() {
       return b_ts - a_ts;
     });
 
-    // Grab the top 10 most recent calls for the dashboard
-    const recentCalls = sortedCalls.slice(0, 10).map((c_raw: unknown) => {
+    // Grab the top 100 most recent calls for the dashboard
+    const recentCalls = sortedCalls.slice(0, 100).map((c_raw: unknown) => {
       const c = c_raw as {
         call_id: string;
         to_number?: string;
