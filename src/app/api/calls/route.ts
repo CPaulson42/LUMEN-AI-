@@ -50,7 +50,7 @@ export async function GET(request: Request) {
       });
       console.log('[API/Calls] Filtered calls length:', filteredCalls.length);
     }
-    
+
     // Sort calls so the newest are first
     const sortedCalls = filteredCalls.sort((a: any, b: any) => {
       const b_ts = b.start_timestamp || 0;
@@ -78,12 +78,12 @@ export async function GET(request: Request) {
         id: c.call_id,
         name: c.to_number || 'Web Call User',
         phone: c.from_number || c.to_number || 'Web Call',
-        duration: c.start_timestamp && c.end_timestamp 
-            ? `${Math.floor((c.end_timestamp - c.start_timestamp) / 60000)}:${String(Math.floor(((c.end_timestamp - c.start_timestamp) / 1000) % 60)).padStart(2, '0')}`
-            : '--',
-        status: c.call_status === 'ongoing' ? 'In Progress' 
-              : c.call_status === 'ended' ? (c.call_analysis?.call_successful ? 'Successful' : 'Unsuccessful')
-              : c.call_status === 'registered' ? 'Queued' : 'Error',
+        duration: c.start_timestamp && c.end_timestamp
+          ? `${Math.floor((c.end_timestamp - c.start_timestamp) / 60000)}:${String(Math.floor(((c.end_timestamp - c.start_timestamp) / 1000) % 60)).padStart(2, '0')}`
+          : '--',
+        status: c.call_status === 'ongoing' ? 'In Progress'
+          : c.call_status === 'ended' ? (c.call_analysis?.call_successful ? 'Successful' : 'Unsuccessful')
+            : c.call_status === 'registered' ? 'Queued' : 'Error',
         result: c.call_status === 'ended' ? (c.call_analysis?.call_successful ? 'successful' : 'unsuccessful') : null,
         summary: c.call_analysis?.call_summary || 'No summary available',
         recording: c.recording_url,

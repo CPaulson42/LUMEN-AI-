@@ -43,7 +43,7 @@ export async function GET() {
     const [authResult, profilesResult, callsResult] = await Promise.allSettled([
       adminSupabase.auth.admin.listUsers(),
       adminSupabase.from('profiles').select('id, subscription_status, stripe_subscription_id'),
-      new Retell({ apiKey: process.env.RETELL_API_KEY || '' }).call.list({ filter_criteria: {} }),
+      new Retell({ apiKey: process.env.RETELL_API_KEY || '' }).call.list({ limit: 1000 }),
     ]);
 
     if (authResult.status === 'rejected') {
@@ -99,9 +99,20 @@ export async function GET() {
     const globalMinutes = Math.ceil(globalMs / 60000);
 
     const usersData = authUsers.map((u: any) => {
+      const email = u.email?.toLowerCase().trim();
       const profile = profileMap[u.id];
-      const tier = profile?.tier || 'Free';
-      const usageMinutes = Math.ceil((usageMap[u.id] || 0) / 60000);
+      let tier = profile?.tier || 'Free';
+      let usageMinutes = Math.ceil((usageMap[u.id] || 0) / 60000);
+
+      console.log(`[AdminAPI] User: ${email}, ProfileTier: ${profile?.tier}, ComputedUsage: ${usageMinutes}`);
+
+      // Force Shrk (Admin) to Partner tier and show ALL calls (global total)
+      if (email === 'shrkfinancial@gmail.com' || email === 'shrkfinancial') {
+        console.log(`[AdminAPI] FORCING Partner tier and global usage (${globalMinutes}) for Shrk`);
+        tier = 'Partner';
+        usageMinutes = globalMinutes;
+      }
+
       const limitMinutes = TIER_LIMITS[tier] ?? 5000;
       return {
         id: u.id,
@@ -112,6 +123,8 @@ export async function GET() {
         limitMinutes,
       };
     });
+
+    console.log(`[AdminAPI] Returning ${usersData.length} users. Global Minutes: ${globalMinutes}`);
 
     return NextResponse.json({ users: usersData, globalMinutes });
   } catch (error) {
