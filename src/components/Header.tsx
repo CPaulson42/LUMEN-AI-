@@ -133,8 +133,13 @@ export default function Header() {
       </nav>
 
       <div className={styles.rightGroup}>
+        {user && (
+          <span className={styles.userEmail}>
+            {user.email}
+          </span>
+        )}
         {user ? (
-          <button onClick={handleSignOut} className={styles.btnDemo} style={{ background: 'transparent', color: 'var(--foreground)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <button onClick={handleSignOut} className={styles.btnSignOut}>
             Sign Out
           </button>
         ) : (
