@@ -110,11 +110,14 @@ export async function GET() {
 
       console.log(`[AdminAPI] User: ${email}, ProfileTier: ${profile?.tier}, ComputedUsage: ${usageMinutes}`);
 
-      // Force Shrk (Admin) to Partner tier and show ALL calls (global total)
+      // Force Shrk (Admin) and 3fintony to Partner tier
       if (email === 'shrkfinancial@gmail.com' || email === 'shrkfinancial') {
         console.log(`[AdminAPI] FORCING Partner tier and global usage (${globalMinutes}) for Shrk`);
         tier = 'Partner';
         usageMinutes = globalMinutes;
+      } else if (email === '3fintony@gmail.com') {
+        console.log(`[AdminAPI] FORCING Partner tier for 3fintony`);
+        tier = 'Partner';
       }
 
       const limitMinutes = TIER_LIMITS[tier] ?? 5000;
