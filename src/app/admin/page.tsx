@@ -19,6 +19,7 @@ export default function AdminPortalPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [globalMinutes, setGlobalMinutes] = useState(0);
+  const [allTimeMinutes, setAllTimeMinutes] = useState(0);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -37,6 +38,7 @@ export default function AdminPortalPage() {
 
       if (data.users) setUsers(data.users);
       if (typeof data.globalMinutes === 'number') setGlobalMinutes(data.globalMinutes);
+      if (typeof data.allTimeMinutes === 'number') setAllTimeMinutes(data.allTimeMinutes);
     } catch (err) {
       console.error('Failed to load admin data:', err);
       setError('A network error occurred while fetching data.');
@@ -81,7 +83,7 @@ export default function AdminPortalPage() {
         <div className={styles.kpiCard}>
           <h3>Global AI Minutes</h3>
           <strong>{globalMinutes.toLocaleString()}</strong>
-          <span className={styles.kpiSub}>Total volume across all accounts</span>
+          <span className={styles.kpiSub}>{allTimeMinutes.toLocaleString()} All-Time Mins</span>
         </div>
         <div className={styles.kpiCard}>
           <h3>System Status</h3>

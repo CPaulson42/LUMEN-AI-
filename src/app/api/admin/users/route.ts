@@ -82,25 +82,31 @@ export async function GET() {
       profileMap[p.id] = { status: p.subscription_status || 'free', tier };
     }
 
-    // Compute per-user usage from Retell call metadata (current month only)
+    // Compute per-user usage from Retell call metadata
     const usageMap: Record<string, number> = {};
-    let globalMs = 0;
+    let currentMonthMs = 0;
+    let allTimeMs = 0;
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
     for (const c of allCalls) {
-      // Only count calls from the current month
-      if (c.start_timestamp && c.end_timestamp && c.start_timestamp >= startOfMonth) {
+      if (c.start_timestamp && c.end_timestamp) {
         const dur = c.end_timestamp - c.start_timestamp;
-        globalMs += dur;
-        const uId = c.metadata?.user_id || c.retell_custom_call_data?.user_id || c.retell_custom_data?.user_id;
-        if (uId) {
-          usageMap[uId] = (usageMap[uId] || 0) + dur;
+        allTimeMs += dur;
+        
+        // Month filter for currentMonthMs and per-user usage map
+        if (c.start_timestamp >= startOfMonth) {
+          currentMonthMs += dur;
+          const uId = c.metadata?.user_id || c.retell_custom_call_data?.user_id || c.retell_custom_data?.user_id;
+          if (uId) {
+            usageMap[uId] = (usageMap[uId] || 0) + dur;
+          }
         }
       }
     }
 
-    const globalMinutes = Math.ceil(globalMs / 60000);
+    const globalMinutes = Math.ceil(currentMonthMs / 60000);
+    const allTimeMinutes = Math.ceil(allTimeMs / 60000);
 
     const usersData = authUsers.map((u: any) => {
       const email = u.email?.toLowerCase().trim();
@@ -112,7 +118,7 @@ export async function GET() {
 
       // Force Shrk (Admin) and 3fintony to Partner tier
       if (email === 'shrkfinancial@gmail.com' || email === 'shrkfinancial') {
-        console.log(`[AdminAPI] FORCING Partner tier and global usage (${globalMinutes}) for Shrk`);
+        console.log(`[AdminAPI] FORCING Partner tier and current usage (${globalMinutes}) for Shrk`);
         tier = 'Partner';
         usageMinutes = globalMinutes;
       } else if (email === '3fintony@gmail.com') {
@@ -131,9 +137,9 @@ export async function GET() {
       };
     });
 
-    console.log(`[AdminAPI] Returning ${usersData.length} users. Global Minutes: ${globalMinutes}`);
+    console.log(`[AdminAPI] Returning ${usersData.length} users. Global (Month): ${globalMinutes}, All-Time: ${allTimeMinutes}`);
 
-    return NextResponse.json({ users: usersData, globalMinutes });
+    return NextResponse.json({ users: usersData, globalMinutes, allTimeMinutes });
   } catch (error) {
     console.error('Admin users fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch admin users' }, { status: 500 });
