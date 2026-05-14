@@ -64,17 +64,22 @@ export default function UserDetailPage() {
 
         if (callsData.calls) {
           setCalls(callsData.calls);
-          // Compute minutes from returned call durations
-          let totalMs = 0;
-          for (const c of callsData.calls) {
-            if (c.duration && c.duration !== '--') {
-              const parts = c.duration.split(':');
-              const mins = parseInt(parts[0], 10) || 0;
-              const secs = parseInt(parts[1], 10) || 0;
-              totalMs += (mins * 60 + secs) * 1000;
+          // Use the server-computed usageMinutes (millisecond precision) if available,
+          // otherwise fall back to parsing duration strings
+          if (typeof callsData.usageMinutes === 'number') {
+            setUsageMinutes(callsData.usageMinutes);
+          } else {
+            let totalMs = 0;
+            for (const c of callsData.calls) {
+              if (c.duration && c.duration !== '--') {
+                const parts = c.duration.split(':');
+                const mins = parseInt(parts[0], 10) || 0;
+                const secs = parseInt(parts[1], 10) || 0;
+                totalMs += (mins * 60 + secs) * 1000;
+              }
             }
+            setUsageMinutes(Math.ceil(totalMs / 60000));
           }
-          setUsageMinutes(Math.ceil(totalMs / 60000));
         }
       } catch (err) {
         console.error('Error fetching user detail:', err);
