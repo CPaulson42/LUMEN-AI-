@@ -31,6 +31,7 @@ export default function UserDetailPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [calls, setCalls] = useState<Call[]>([]);
   const [loading, setLoading] = useState(true);
+  const [usageMinutes, setUsageMinutes] = useState(0);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const supabase = createClient();
 
@@ -50,16 +51,31 @@ export default function UserDetailPage() {
       setIsAuthorized(true);
 
       try {
-        // Fetch users to find this specific one (simpler than a new endpoint for now)
         const userRes = await fetch('/api/admin/users');
         const userData = await userRes.json();
         const foundUser = userData.users?.find((u: any) => u.id === id);
         if (foundUser) setUserProfile(foundUser);
 
-        // Fetch this user's specific calls
-        const callsRes = await fetch(`/api/calls?userId=${id}`);
+        // Admin (shrkfinancial) sees ALL calls — other users are filtered by userId
+        const isViewingAdmin = foundUser?.email?.toLowerCase().trim() === 'shrkfinancial@gmail.com';
+        const callsUrl = isViewingAdmin ? '/api/calls' : `/api/calls?userId=${id}`;
+        const callsRes = await fetch(callsUrl);
         const callsData = await callsRes.json();
-        if (callsData.calls) setCalls(callsData.calls);
+
+        if (callsData.calls) {
+          setCalls(callsData.calls);
+          // Compute minutes from returned call durations
+          let totalMs = 0;
+          for (const c of callsData.calls) {
+            if (c.duration && c.duration !== '--') {
+              const parts = c.duration.split(':');
+              const mins = parseInt(parts[0], 10) || 0;
+              const secs = parseInt(parts[1], 10) || 0;
+              totalMs += (mins * 60 + secs) * 1000;
+            }
+          }
+          setUsageMinutes(Math.ceil(totalMs / 60000));
+        }
       } catch (err) {
         console.error('Error fetching user detail:', err);
       } finally {
@@ -91,7 +107,7 @@ export default function UserDetailPage() {
           </span>
         </div>
         <div className={styles.topStats}>
-          <div className={styles.topStat}><span>Lifetime Usage</span><strong>{userProfile.minutesUsed} min</strong></div>
+          <div className={styles.topStat}><span>Minutes Used</span><strong>{usageMinutes} min</strong></div>
           <div className={styles.topStat}><span>Total Calls</span><strong>{calls.length}</strong></div>
         </div>
       </div>
