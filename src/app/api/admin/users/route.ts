@@ -82,11 +82,15 @@ export async function GET() {
       profileMap[p.id] = { status: p.subscription_status || 'free', tier };
     }
 
-    // Compute per-user usage from Retell call metadata
+    // Compute per-user usage from Retell call metadata (current month only)
     const usageMap: Record<string, number> = {};
     let globalMs = 0;
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
     for (const c of allCalls) {
-      if (c.start_timestamp && c.end_timestamp) {
+      // Only count calls from the current month
+      if (c.start_timestamp && c.end_timestamp && c.start_timestamp >= startOfMonth) {
         const dur = c.end_timestamp - c.start_timestamp;
         globalMs += dur;
         const uId = c.metadata?.user_id || c.retell_custom_call_data?.user_id || c.retell_custom_data?.user_id;
