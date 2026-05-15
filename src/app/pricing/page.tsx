@@ -13,7 +13,7 @@ export default function PricingPage() {
       setErrorMsg('Price ID is missing for ' + planName + ' plan. Check environment variables.');
       return;
     }
-    
+
     setIsLoading(planName);
     try {
       const response = await fetch('/api/checkout_sessions', {
@@ -57,7 +57,7 @@ export default function PricingPage() {
       </section>
 
       <div className={`${styles.pricingGrid} fade-in`} style={{ animationDelay: '0.1s' }}>
-        
+
 
 
         {/* Tier 2: Pro (Highlighted) */}
@@ -67,7 +67,7 @@ export default function PricingPage() {
           <div className={styles.planPrice}>
             <strong>$199</strong><span>/mo</span>
           </div>
-          
+
           <div className={styles.featureList}>
             <div className={styles.featureItem}>
               <CheckIcon />
@@ -95,8 +95,8 @@ export default function PricingPage() {
               <span>Outside Lead Integration</span>
             </div>
           </div>
-          
-          <button 
+
+          <button
             className={`${styles.ctaButton} ${styles.primary}`}
             onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PROFESSIONAL, 'Professional')}
             disabled={isLoading !== null}
@@ -111,7 +111,7 @@ export default function PricingPage() {
           <div className={styles.planPrice}>
             <strong>$599</strong><span>/mo</span>
           </div>
-          
+
           <div className={styles.featureList}>
             <div className={styles.featureItem}>
               <CheckIcon />
@@ -146,8 +146,8 @@ export default function PricingPage() {
               <span><strong>Admin Panel Access</strong></span>
             </div>
           </div>
-          
-          <button 
+
+          <button
             className={`${styles.ctaButton} ${styles.secondary}`}
             onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_SCALE, 'Scale')}
             disabled={isLoading !== null}
@@ -163,7 +163,7 @@ export default function PricingPage() {
           <div className={styles.planPrice}>
             <strong>$999</strong><span>/mo</span>
           </div>
-          
+
           <div className={styles.featureList}>
             <div className={styles.featureItem}>
               <CheckIcon />
@@ -202,8 +202,8 @@ export default function PricingPage() {
               <span><strong>Admin Panel Access</strong></span>
             </div>
           </div>
-          
-          <button 
+
+          <button
             className={`${styles.ctaButton} ${styles.secondary}`}
             onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PARTNER, 'Partner')}
             disabled={isLoading !== null}

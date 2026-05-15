@@ -89,6 +89,18 @@ export default function Home() {
           <h3>Cost Savings</h3>
           <p>Reduce operational costs by automating repetitive tasks. Replace high-volume manual dialing with AI that works around the clock for a fraction of the cost.</p>
         </div>
+
+        <div className={`${styles.featureCard} glass-panel premium-card`}>
+          <div className={styles.iconWrapper}>
+            <svg className="neon-blue-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <h3>Integration</h3>
+          <p>Unlocking 200+ Automation Use Cases for Small Businesses. Lumen AI Voice Agents don&apos;t just talk; they execute workflows, sync data, and manage your operations 24/7.</p>
+        </div>
       </section>
 
       <section className={`${styles.processSection} fade-in`} style={{ animationDelay: '0.15s' }}>
