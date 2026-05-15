@@ -77,7 +77,7 @@ export default function Header() {
                 className={styles.logoImage}
               />
             </div>
-            <span className={styles.logoText}>Lumen <span style={{ color: '#007fff' }}>AI</span></span>
+            <span className={styles.logoText}>Lumen AI</span>
           </div>
         </Link>
         <div className={styles.separator}></div>
