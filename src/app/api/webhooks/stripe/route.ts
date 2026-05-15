@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const sig = req.headers.get('stripe-signature');
 
   if (!sig) {
-    console.error('Webhook Error: Missing stripe-signature header.');
+    console.error('webhook Error: Missing stripe-signature header.');
     return NextResponse.json(
       { error: 'Missing stripe-signature header' },
       { status: 400 }
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err) {
     const error = err as { message: string };
-    console.error('Webhook signature verification failed:', error.message);
+    console.error(`  Webhook signature verification failed:`, error.message);
     return NextResponse.json(
       { error: `Webhook Error: ${error.message}` },
       { status: 400 }
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Successfully constructed event — now handle it.
-  console.log('Webhook received:', event.type);
+  console.log(` Webhook received: ${event.type}`);
 
   switch (event.type) {
     case 'checkout.session.completed': {
@@ -65,14 +65,14 @@ export async function POST(req: NextRequest) {
       if (customerEmail) {
         const { error } = await supabaseAdmin
           .from('profiles')
-          .update({ 
+          .update({
             stripe_customer_id: customerId,
             stripe_subscription_id: subscriptionId,
             subscription_status: 'active',
             plan_name: planName,
           })
           .eq('email', customerEmail);
-          
+
         if (error) console.error('Error updating profile on checkout:', error);
       }
       break;
@@ -84,11 +84,11 @@ export async function POST(req: NextRequest) {
 
       const { error } = await supabaseAdmin
         .from('profiles')
-        .update({ 
+        .update({
           subscription_status: 'active'
         })
         .eq('stripe_customer_id', customerId);
-        
+
       if (error) console.error('Error updating profile on invoice payment:', error);
       break;
     }
@@ -99,11 +99,11 @@ export async function POST(req: NextRequest) {
 
       const { error } = await supabaseAdmin
         .from('profiles')
-        .update({ 
+        .update({
           subscription_status: 'past_due'
         })
         .eq('stripe_customer_id', customerId);
-        
+
       if (error) console.error('Error updating profile on payment failure:', error);
       break;
     }
@@ -114,17 +114,17 @@ export async function POST(req: NextRequest) {
 
       const { error } = await supabaseAdmin
         .from('profiles')
-        .update({ 
+        .update({
           subscription_status: 'canceled'
         })
         .eq('stripe_customer_id', customerId);
-        
+
       if (error) console.error('Error updating profile on cancellation:', error);
       break;
     }
 
     default:
-      console.log('Unhandled event type:', event.type);
+      console.log(`ℹ️  Unhandled event type: ${event.type}`);
   }
 
   return NextResponse.json({ received: true });
