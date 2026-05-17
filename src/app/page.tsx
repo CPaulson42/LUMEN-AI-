@@ -7,8 +7,8 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <section className={`${styles.hero} fade-in`}>
-        <h1>Your AI Voice for the Future</h1>
-        <p>Traditional call centers are expensive, inconsistent, and hard to manage. Lumen AI provides ultra-realistic voice agents that never sleep, never miss a detail, and scale instantly to handle thousands of calls.</p>
+        <h1>Your Superior <span style={{ color: '#007fff' }}>AI</span> Voice for the Future</h1>
+        <p>Traditional call centers are expensive, inconsistent, and hard to manage. Lumen AI provides ultra-humanistic voice agents that never sleep, never miss a detail, and scale instantly to handle thousands of calls.</p>
         <div className={styles.heroActions}>
           <Link href="/pricing" className={styles.ctaButton}>
             Get Started
@@ -30,7 +30,7 @@ export default function Home() {
             </svg>
           </div>
           <h3>Ultra Human-like AI Voices</h3>
-          <p>Indistinguishable from real agents. Our ultra-realistic voices build trust and engagement with your prospects.</p>
+          <p>Indistinguishable from real agents. Our ultra-humanistic voices build trust and engagement with your prospects.</p>
         </div>
 
         <div className={`${styles.featureCard} glass-panel premium-card`}>
