@@ -81,7 +81,7 @@ export default function Header() {
           </div>
         </Link>
         <div className={styles.separator}></div>
-        <span className={styles.tagline}>Shedding light on hidden opportunities</span>
+        <span className={styles.tagline}>THE LIGHT YOU WERE LOOKING FOR</span>
       </div>
 
       <nav className={styles.nav}>
@@ -109,6 +109,12 @@ export default function Header() {
         {user && (
           <>
             <Link
+              href="/restaurant-demo"
+              className={`${styles.navLink} ${pathname?.startsWith('/restaurant-demo') ? styles.active : ''}`}
+            >
+              Restaurant Demo
+            </Link>
+            <Link
               href="/billing"
               className={`${styles.navLink} ${pathname?.startsWith('/billing') ? styles.active : ''}`}
             >
@@ -122,6 +128,12 @@ export default function Header() {
                 Admin Portal
               </Link>
             )}
+            <Link
+              href="/docs"
+              className={`${styles.navLink} ${pathname?.startsWith('/docs') ? styles.active : ''}`}
+            >
+              Docs
+            </Link>
             <Link
               href="/partner"
               className={`${styles.navLink} ${pathname?.startsWith('/partner') ? styles.active : ''}`}

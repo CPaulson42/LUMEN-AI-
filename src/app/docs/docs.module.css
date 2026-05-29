@@ -1,0 +1,204 @@
+.docsContainer {
+  display: flex;
+  min-height: calc(100vh - 80px); /* Assuming header is around 80px */
+  background-color: var(--background, #0a0a0a);
+  color: var(--foreground, #ffffff);
+}
+
+.sidebar {
+  width: 280px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2rem 1.5rem;
+  position: sticky;
+  top: 80px;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+  background-color: var(--background, #0a0a0a);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.sidebarGroup {
+  margin-bottom: 2rem;
+}
+
+.sidebarTitle {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.sidebarLink {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  padding: 0.5rem 0;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.sidebarLink:hover, .sidebarLink.active {
+  color: #00ffff; /* Cyan hover */
+}
+
+.mainContent {
+  flex: 1;
+  padding: 3rem 4rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  margin-bottom: 2.5rem;
+}
+
+.pageHeader h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.pageHeader p {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+}
+
+.contentSection {
+  margin-bottom: 3.5rem;
+}
+
+.contentSection h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  letter-spacing: -0.01em;
+}
+
+.contentSection h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+}
+
+.contentSection p {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  font-size: 1.05rem;
+}
+
+.contentSection ul {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.contentSection li {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+
+/* Feature Cards (Choose your path) */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.card {
+  display: block;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: #00ffff; /* Cyan outline */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 255, 255, 0.15); /* Cyan glow */
+}
+
+.card h3 {
+  color: #fff;
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0;
+}
+
+.card h3 svg {
+  color: #00ffff; /* Cyan icons */
+}
+
+.card p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+.callout {
+  background: rgba(0, 255, 255, 0.05);
+  border-left: 4px solid #00ffff;
+  padding: 1rem 1.5rem;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 1.5rem;
+}
+
+.callout p {
+  margin-bottom: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 240px;
+  }
+  .mainContent {
+    padding: 2.5rem 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .docsContainer {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+  }
+  .mainContent {
+    padding: 2rem 1.5rem;
+  }
+}
