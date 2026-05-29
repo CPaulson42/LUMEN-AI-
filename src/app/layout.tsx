@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Lumen Leads | AI-Powered Insurance Qualification",
+  title: "Lumen AI",
   description: "THE LIGHT YOU WERE LOOKING FOR.",
   icons: {
     icon: '/neon-lighthouse.jpg',

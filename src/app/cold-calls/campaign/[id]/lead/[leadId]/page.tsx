@@ -25,7 +25,7 @@ const LEAD_DATABASE = {
     result: null,
     summary: 'Discussing $500k coverage options, considering term vs whole life.',
     transcript: [
-      { speaker: 'ai', text: "Hi John, this is Alex from Lumen Leads. I'm following up on your request for life insurance information. How are you today?", time: '0:00' },
+      { speaker: 'ai', text: "Hi John, this is Alex from Lumen AI. I'm following up on your request for life insurance information. How are you today?", time: '0:00' },
       { speaker: 'user', text: "I'm doing well, thanks.", time: '0:06' },
       { speaker: 'ai', text: "Great. I see you were looking for roughly $500,000 in coverage. Did you have a preference between term-life or a whole-life policy?", time: '0:08' },
       { speaker: 'user', text: "I'm not completely sure. What's the main difference in monthly cost?", time: '0:18' },
@@ -43,7 +43,7 @@ const LEAD_DATABASE = {
     result: 'qualified',
     summary: 'Interested in Term-Life $500k. Follow-up scheduled.',
     transcript: [
-      { speaker: 'ai', text: "Hi Maria, this is Alex calling from Lumen Leads regarding your recent inquiry for life insurance. Do you have a quick minute?", time: '0:00' },
+      { speaker: 'ai', text: "Hi Maria, this is Alex calling from Lumen AI regarding your recent inquiry for life insurance. Do you have a quick minute?", time: '0:00' },
       { speaker: 'user', text: "Yes, I do.", time: '0:05' },
       { speaker: 'ai', text: "Excellent. I saw you were looking for coverage to protect your mortgage and family. Does half a million in coverage sound about right for your current needs?", time: '0:07' },
       { speaker: 'user', text: "Yes, $500,000 is exactly what my husband and I discussed.", time: '0:15' },

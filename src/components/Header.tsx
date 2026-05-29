@@ -72,7 +72,7 @@ export default function Header() {
             <div className={styles.logoIcon}>
               <img
                 src="/neon-lighthouse.jpg"
-                alt="Lumen Leads Logo"
+                alt="Lumen AI Logo"
                 style={{ width: '36px', height: '36px', borderRadius: '0.6rem' }}
                 className={styles.logoImage}
               />
