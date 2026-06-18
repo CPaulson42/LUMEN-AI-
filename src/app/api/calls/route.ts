@@ -25,41 +25,36 @@ export async function GET(request: Request) {
     const isAdmin = user.email?.toLowerCase().trim() === 'shrkfinancial@gmail.com';
     console.log('[API/Calls] User Email:', user.email, '| isAdmin:', isAdmin);
 
-    // Fetch calls. You can optionally pass filter_criteria in the object if needed.
-    // E.g., retell.call.list({ filter_criteria: { agent_id: [...] } })
+    // Fetch calls - v5.32: use sort_order and limit for efficiency
     const retell = getRetellClient();
-    const callResponse = await retell.call.list({ filter_criteria: {} });
-    console.log('[API/Calls] Fetched from Retell:', callResponse?.length || 0, 'calls');
+    const callResponse = await retell.call.list({
+      filter_criteria: {},
+      sort_order: 'descending',
+      limit: 1000,
+    });
+    const items = callResponse.items || [];
+    console.log('[API/Calls] Fetched from Retell:', items.length || 0, 'calls');
 
     // Filter calls based on user privileges
-    let filteredCalls = [...callResponse];
+    // v5.32: metadata.user_id is the only supported field (retell_custom_call_data/retell_custom_data are deprecated)
+    let filteredCalls = [...items];
     if (!isAdmin) {
       filteredCalls = filteredCalls.filter((c: any) => {
         const metadataUserId = c.metadata?.user_id;
-        const customDataUserId = c.retell_custom_call_data?.user_id;
-        const phoneCustomDataUserId = c.retell_custom_data?.user_id;
-        return metadataUserId === user.id || customDataUserId === user.id || phoneCustomDataUserId === user.id;
+        return metadataUserId === user.id;
       });
     } else if (specificUserId) {
       console.log('[API/Calls] Filtering for specific user:', specificUserId);
       filteredCalls = filteredCalls.filter((c: any) => {
         const metadataUserId = c.metadata?.user_id;
-        const customDataUserId = c.retell_custom_call_data?.user_id;
-        const phoneCustomDataUserId = c.retell_custom_data?.user_id;
-        return metadataUserId === specificUserId || customDataUserId === specificUserId || phoneCustomDataUserId === specificUserId;
+        return metadataUserId === specificUserId;
       });
       console.log('[API/Calls] Filtered calls length:', filteredCalls.length);
     }
 
-    // Sort calls so the newest are first
-    const sortedCalls = filteredCalls.sort((a: any, b: any) => {
-      const b_ts = b.start_timestamp || 0;
-      const a_ts = a.start_timestamp || 0;
-      return b_ts - a_ts;
-    });
-
+    // Already sorted descending from the API, no need to re-sort
     // Grab the top 100 most recent calls for the dashboard
-    const recentCalls = sortedCalls.slice(0, 100).map((c_raw: unknown) => {
+    const recentCalls = filteredCalls.slice(0, 100).map((c_raw: unknown) => {
       const c = c_raw as {
         call_id: string;
         to_number?: string;
@@ -73,7 +68,6 @@ export async function GET(request: Request) {
         };
         recording_url?: string;
       };
-      // Map to the format the dashboard expects
       return {
         id: c.call_id,
         name: c.to_number || 'Web Call User',

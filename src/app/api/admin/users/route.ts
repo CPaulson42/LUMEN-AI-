@@ -43,7 +43,10 @@ export async function GET() {
     const [authResult, profilesResult, callsResult] = await Promise.allSettled([
       adminSupabase.auth.admin.listUsers(),
       adminSupabase.from('profiles').select('id, subscription_status, stripe_subscription_id'),
-      new Retell({ apiKey: process.env.RETELL_API_KEY || '' }).call.list({ limit: 1000 }),
+      new Retell({ apiKey: process.env.RETELL_API_KEY || '' }).call.list({
+        limit: 1000,
+        sort_order: 'descending',
+      }),
     ]);
 
     if (authResult.status === 'rejected') {
@@ -52,7 +55,7 @@ export async function GET() {
 
     const authUsers = (authResult.value as any).data?.users || [];
     const profiles: any[] = profilesResult.status === 'fulfilled' ? ((profilesResult.value as any).data || []) : [];
-    const allCalls: any[] = callsResult.status === 'fulfilled' ? (callsResult.value as any[] || []) : [];
+    const allCalls: any[] = callsResult.status === 'fulfilled' ? ((callsResult.value as any).items || []) : [];
 
     // Resolve tier per user via Stripe price ID
     const priceToPlan = getPriceToPlanMap();
