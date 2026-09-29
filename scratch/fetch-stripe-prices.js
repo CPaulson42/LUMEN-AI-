@@ -1,5 +1,10 @@
+// NOTE: Never hardcode API keys in the repository
+// Use environment variables instead
+
+require('dotenv').config({ path: '.env.local' });
+
 const Stripe = require('stripe');
-const stripe = new Stripe('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');
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 async function listPrices() {
   try {
